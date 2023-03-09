@@ -1,7 +1,8 @@
 import { BrowserRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
 
-import RootLayout from "./layouts/rootLayout";
+import RootLayout from "app/layouts/rootLayout";
+import GolobalStyles from "styles/GlobalStyles";
 
 export function App() {
   return (
@@ -10,7 +11,9 @@ export function App() {
         <title>Revise - Dashboard</title>
         <meta name="description" content="Helmet application" />
       </Helmet>
-      <RootLayout />
+      <GolobalStyles>
+        <RootLayout />
+      </GolobalStyles>
     </BrowserRouter>
   );
 }

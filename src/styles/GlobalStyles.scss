@@ -1,0 +1,60 @@
+@import "normalize.css";
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@200;300;400;500;600;700&display=swap");
+
+:root {
+  --primary: #fe2c55;
+  --black: #000;
+  --white: #fff;
+  --dark-text: #161823;
+  --link-blue-text: #2a5dc4;
+
+  --primary-color-action: #242529;
+  --poper-color: #434343;
+  --in-progress-item-bg: #1d2432;
+  --white-gray: #d2d2d2;
+  --main-green: #32c766;
+
+  --font-family: "roboto", "IBM Plex Sans", sans-serif;
+
+  --brown-bg: #242529;
+  --sidebar-hover: #efe9ff;
+  --division-line: #483d52;
+  --blue-shadow: #4c9aff;
+  --brown-shadow: #444343;
+  --background-main: #161819;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: 1.6rem;
+  line-height: 1.5;
+  text-rendering: optimizeSpeed;
+  color: var(--text-color);
+  overflow-y: overlay;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

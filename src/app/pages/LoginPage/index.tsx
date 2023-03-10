@@ -1,3 +1,5 @@
+import { LoginWrapper } from "app/containers/LoginWrapper";
+
 export const LoginPage = () => {
-  return <>login</>;
+  return <LoginWrapper />;
 };

@@ -1,107 +1,142 @@
 .container {
-  width: 345px;
-  height: auto;
-  min-height: calc(100vh - 110px);
-  background-color: var(--brown-bg);
-  display: flex;
-}
-
-.container.close {
-  width: 84px;
-  transition: all 0.22s linear;
-}
-
-.contain {
-  padding-top: 28px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.navigate {
-  border: 2px solid var(--white);
-  margin: 8px 20px;
-  padding: 12px 20px;
-  color: var(--white);
-  text-decoration: none;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-
-  &:hover {
-    background-color: var(--sidebar-hover);
-    color: var(--black);
-  }
-
-  &.close {
-    margin: 8px 7px;
-  }
-}
-
-.navigate.active {
-  background-color: var(--sidebar-hover);
-  color: var(--black);
-}
-
-.name {
-  margin-left: 20px;
-  font-size: 20px;
-  font-weight: 400;
-
-  &.close {
-    display: none;
-  }
-}
-
-.divisionLine {
-  height: 100%;
-  width: 3px;
-  background-color: var(--division-line);
+  max-width: 300px;
+  border-right: 1px dashed rgb(229, 231, 235);
   position: relative;
-  z-index: 2;
+}
 
-  &::before {
-    position: absolute;
-    content: "";
-    display: block;
-    height: 100%;
-    width: 10px;
-    z-index: 1;
-  }
+.arrow {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  top: 70px;
+  right: 0;
+  transform: translate(50%, -50%);
+  border: 1px dashed rgb(229, 231, 235);
 
-  &:hover {
-    cursor: ew-resize;
-    box-shadow: var(--blue-shadow) 0px 0px 8px;
-    background-color: var(--blue-shadow);
-  }
-
-  .iconWrapper {
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--white);
-    border-radius: 50%;
-    box-shadow: var(--brown-shadow) 0 0 5px;
-    cursor: pointer;
-    right: 0;
-    top: 0;
-    transform: translate(50%, -50%);
-    z-index: 3;
+  & .icon {
+    fill: rgb(155, 155, 155);
 
     &:hover {
-      background-color: var(--blue-shadow);
-    }
-
-    &:hover .arrowIcon {
-      color: var(--white);
+      fill: var(--primary);
     }
   }
+}
 
-  .arrowIcon {
-    color: var(--black);
-    font-size: 16px;
+.sidebarHeader {
+  padding: 20px;
+}
+
+.logoWrapper {
+  width: 54px;
+  height: 54px;
+  top: 64px;
+  left: 64px;
+  cursor: pointer;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background-color: rgba(145, 158, 171, 0.12);
+  margin-top: 40px;
+}
+
+.avatarWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  font-size: 1.25rem;
+  line-height: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  user-select: none;
+  color: rgb(255, 255, 255);
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  object-fit: cover;
+  color: transparent;
+  text-indent: 10000px;
+}
+
+.infoWrapper {
+  margin-left: 16px;
+  min-width: 0px;
+}
+
+.fullname {
+  margin: 0px;
+  font-weight: 600;
+  line-height: 1.57143;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.email {
+  margin: 0px;
+  line-height: 1.57143;
+  font-size: 0.875rem;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgb(99, 115, 129);
+}
+
+.menuList {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.menu {
+  width: 100%;
+  text-decoration: none;
+  background-color: #fff;
+  padding: 8px 16px;
+  color: #000;
+  height: 48px;
+  text-transform: capitalize;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  margin: 4px 0;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: rgba(145, 158, 171, 0.08);
+  }
+
+  & > span {
+    height: 24px;
+    width: 24px;
+  }
+
+  & > strong {
+    margin-left: 16px;
+    font-weight: 500;
+  }
+
+  &.active {
+    background-color: rgba(0, 171, 85, 0.08);
+    color: var(--primary);
   }
 }

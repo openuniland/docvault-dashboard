@@ -6,7 +6,7 @@ import { LoginPage } from "../LoginPage";
 const tokens = getTokens();
 
 const Pages = {
-  Home: withAppHeader(withSidebar(HomePage)),
+  Home: withSidebar(withAppHeader(HomePage)),
   Login: LoginPage,
 };
 

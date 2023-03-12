@@ -39,14 +39,9 @@ http.interceptors.response.use(
       return apiResponseData;
     }
 
-    if (
-      errorMessage === "invalid signature" ||
-      errorMessage === "jwt malformed"
-    ) {
-      removeItemFromStorage("tokens");
-      removeItemFromStorage("userData");
-      window.location.replace("/");
-    }
+    removeItemFromStorage("tokens");
+    removeItemFromStorage("userData");
+    window.location.replace("/");
 
     return Promise.reject(error?.response?.data);
   },

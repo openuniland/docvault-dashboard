@@ -6,12 +6,12 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import PeopleIcon from "@mui/icons-material/People";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
+import { Link, useLocation } from "react-router-dom";
 
 import styles from "./Sidebar.module.scss";
 import logo from "assets/images/logo.png";
 import { getTokens } from "utils/storage";
 import { ButtonCustomization } from "../ButtonCustomization";
-import { Link, useLocation } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 

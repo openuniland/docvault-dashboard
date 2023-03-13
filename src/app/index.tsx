@@ -6,7 +6,8 @@ import RootLayout from "app/layouts/rootLayout";
 import GolobalStyles from "styles/GlobalStyles";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import configs from "configs";
-import { StyledEngineProvider } from "@mui/material";
+import { StyledEngineProvider, ThemeProvider } from "@mui/material";
+import muiTheme from "themes/muiTheme";
 
 const queryClient = new QueryClient();
 const clientId = configs.google.clientId;
@@ -19,13 +20,15 @@ export function App() {
           <title>Revise - Dashboard</title>
           <meta name="description" content="Helmet application" />
         </Helmet>
-        <StyledEngineProvider injectFirst>
-          <GolobalStyles>
-            <GoogleOAuthProvider clientId={clientId}>
-              <RootLayout />
-            </GoogleOAuthProvider>
-          </GolobalStyles>
-        </StyledEngineProvider>
+        <ThemeProvider theme={muiTheme}>
+          <StyledEngineProvider injectFirst>
+            <GolobalStyles>
+              <GoogleOAuthProvider clientId={clientId}>
+                <RootLayout />
+              </GoogleOAuthProvider>
+            </GolobalStyles>
+          </StyledEngineProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

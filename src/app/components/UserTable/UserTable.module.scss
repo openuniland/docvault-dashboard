@@ -2,7 +2,7 @@
   height: 100px;
   display: flex;
   flex-direction: column;
-  padding: 40px;
+  padding: 20px;
 }
 
 .action {
@@ -52,21 +52,83 @@
   }
 }
 
-.addUserBtn {
-  background-color: rgb(0, 171, 85);
-  color: #fff;
-  font-weight: 500;
-  border-radius: 4px;
-  padding: 8px 16px;
-  margin: 0 16px;
-  cursor: pointer;
-  margin-bottom: 20px;
+.tableHead {
+  background-color: #f4f6f8;
+}
 
-  &:hover {
-    background-color: rgb(0, 171, 85, 0.8);
+.checkbox {
+  color: rgb(0, 171, 85) !important;
+}
+
+.formSearch {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+
+  & .searchWrapper {
+    display: flex;
+    flex-direction: inherit;
+    align-items: center;
+    flex: 1;
+    border: 1px solid #c4c4c4;
+    margin-left: 20px;
+    border-radius: 4px;
+    height: 56px;
+
+    & .searchIcon {
+      margin: 0 8px;
+      color: #c4c4c4;
+    }
+
+    &:hover {
+      border-color: #00ab55;
+    }
+
+    & .inputbase {
+      width: 100%;
+      padding-right: 20px;
+    }
   }
 }
 
-.tableHead {
-  background-color: #f4f6f8;
+.paperOfMenu {
+  margin-top: 10px;
+  overflow-x: initial;
+  overflow-y: initial;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+
+  &::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 36px;
+    right: -5px;
+    width: 10px;
+    height: 10px;
+    background-color: rgb(255, 255, 255);
+    transform: translateY(-50%) rotate(45deg);
+    z-index: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  & .menuItem {
+    display: flex;
+    padding: 6px 12px;
+    font-size: 1rem;
+    text-decoration: none;
+    color: #000;
+
+    & > p {
+      padding: 0 8px;
+    }
+
+    & .delete {
+      color: rgb(255, 0, 0);
+    }
+
+    & .icon {
+      font-size: 1.4rem;
+    }
+  }
 }

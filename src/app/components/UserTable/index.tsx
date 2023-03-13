@@ -9,18 +9,23 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
 import { visuallyHidden } from "@mui/utils";
-import { User } from "types/User";
 import { useCallback, useMemo, useState } from "react";
 import classNames from "classnames/bind";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
-
-import styles from "./UserTable.module.scss";
+import SearchIcon from "@mui/icons-material/Search";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import { useNavigate } from "react-router-dom";
 import {
-  Button,
+  Autocomplete,
+  FormControl,
   IconButton,
+  InputBase,
   Menu,
+  MenuItem,
   Tab,
   Tabs,
   TextField,
@@ -28,6 +33,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+
+import { User } from "types/User";
+import styles from "./UserTable.module.scss";
 
 const cx = classNames.bind(styles);
 
@@ -80,7 +88,6 @@ interface HeadCell {
   label: string;
   numeric: boolean;
   sortable?: boolean;
-  filterDropdown?: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
@@ -96,7 +103,6 @@ const headCells: readonly HeadCell[] = [
     disablePadding: false,
     sortable: true,
     label: "Full Name",
-    filterDropdown: true,
   },
   {
     id: "email",
@@ -104,7 +110,6 @@ const headCells: readonly HeadCell[] = [
     disablePadding: false,
     sortable: true,
     label: "Email",
-    filterDropdown: true,
   },
   {
     id: "roles",
@@ -124,6 +129,13 @@ const headCells: readonly HeadCell[] = [
     disablePadding: false,
     sortable: true,
     label: "Created At",
+  },
+  {
+    id: "_id",
+    numeric: false,
+    disablePadding: false,
+    sortable: true,
+    label: "",
   },
 ];
 
@@ -149,21 +161,10 @@ const EnhancedTableHead = (props: TableHeadProps) => {
     onRequestSort,
   } = props;
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
   const createSortHandler =
     (property: keyof User) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
 
   return (
     <TableHead className={cx("tableHead")}>
@@ -174,11 +175,12 @@ const EnhancedTableHead = (props: TableHeadProps) => {
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={onSelectAllClick}
+            className={cx("checkbox")}
           />
         </TableCell>
         {headCells.map(headCell => (
           <TableCell
-            key={headCell.id}
+            key={headCell.label}
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
@@ -201,20 +203,6 @@ const EnhancedTableHead = (props: TableHeadProps) => {
             ) : (
               <>{headCell.label}</>
             )}
-
-            {headCell.filterDropdown && (
-              <IconButton onClick={handleClick}>
-                <FilterListIcon />
-              </IconButton>
-            )}
-
-            <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
-              <TextField
-                id="outlined-basic"
-                label="Outlined"
-                variant="outlined"
-              />
-            </Menu>
           </TableCell>
         ))}
       </TableRow>
@@ -272,10 +260,16 @@ interface Props {
 
 export const UsersTable = (props: Props) => {
   const { rows = [] } = props;
+
+  const navigate = useNavigate();
+
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof User>("fullname");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [valueOfTab, setValueOfTab] = useState(0);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [editId, setEditId] = useState("");
+  const open = Boolean(anchorEl);
 
   const handleSelectAllClick = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -286,7 +280,7 @@ export const UsersTable = (props: Props) => {
       }
       setSelected([]);
     },
-    [selected],
+    [selected, rows],
   );
 
   const handleRequestSort = useCallback(
@@ -335,59 +329,81 @@ export const UsersTable = (props: Props) => {
     [valueOfTab],
   );
 
+  const handleShowAction = useCallback(
+    (id: string) => (event: React.MouseEvent<HTMLButtonElement>) => {
+      setAnchorEl(event.currentTarget);
+      setEditId(id);
+    },
+    [anchorEl, editId],
+  );
+
+  const handleCloseMenu = useCallback(() => {
+    setAnchorEl(null);
+  }, [anchorEl]);
+
+  const handleToEditPage = useCallback(() => {
+    navigate(`/users/edit/${editId}`);
+  }, [navigate, editId]);
+
   return (
     <Box className={cx("container")}>
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button className={cx("addUserBtn")} variant="contained" sx={{ mr: 1 }}>
-          Thêm mới người dùng
-        </Button>
-      </Box>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={valueOfTab}
-          onChange={HandleChangeTab}
-          className={cx("tabs")}
-          classes={{ indicator: cx("indicator") }}
+      <Paper className={cx("paper")}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={valueOfTab}
+            onChange={HandleChangeTab}
+            className={cx("tabs")}
+            classes={{ indicator: cx("indicator") }}
+          >
+            <Tab label="All" classes={{ selected: cx("selected") }} />
+            <Tab label="ADMIN" classes={{ selected: cx("selected") }} />
+            <Tab label="USER" classes={{ selected: cx("selected") }} />
+          </Tabs>
+        </Box>
+        <Box
+          sx={{ borderBottom: 1, borderColor: "divider" }}
+          className={cx("formSearch")}
         >
-          <Tab label="All" classes={{ selected: cx("selected") }} />
-          <Tab label="ADMIN" classes={{ selected: cx("selected") }} />
-          <Tab label="USER" classes={{ selected: cx("selected") }} />
-        </Tabs>
-      </Box>
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
-          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {changeData(rows, valueOfTab, orderBy, order).map(
-                (row, index) => {
+          <Autocomplete
+            disablePortal
+            options={headCells}
+            sx={{ width: 300 }}
+            renderInput={params => <TextField {...params} label="Options" />}
+          />
+
+          <FormControl className={cx("searchWrapper")}>
+            <SearchIcon className={cx("searchIcon")} />
+            <InputBase placeholder="Search..." className={cx("inputbase")} />
+          </FormControl>
+        </Box>
+        <Paper>
+          <EnhancedTableToolbar numSelected={selected.length} />
+          <TableContainer>
+            <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
+              <EnhancedTableHead
+                numSelected={selected.length}
+                order={order}
+                orderBy={orderBy}
+                onSelectAllClick={handleSelectAllClick}
+                onRequestSort={handleRequestSort}
+                rowCount={rows.length}
+              />
+              <TableBody>
+                {changeData(rows, valueOfTab, orderBy, order).map(row => {
                   const isItemSelected = isSelected(row._id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
                   return (
-                    <TableRow
-                      hover
-                      onClick={handleClick(row._id)}
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={row._id}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox color="primary" checked={isItemSelected} />
-                      </TableCell>
+                    <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>
                       <TableCell
-                        component="th"
-                        scope="row"
-                        padding="none"
-                        id={labelId}
+                        padding="checkbox"
+                        onClick={handleClick(row._id)}
                       >
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          className={cx("checkbox")}
+                        />
+                      </TableCell>
+                      <TableCell component="th" scope="row" padding="none">
                         {row._id}
                       </TableCell>
                       <TableCell align="left">{row.fullname}</TableCell>
@@ -399,13 +415,51 @@ export const UsersTable = (props: Props) => {
                           "hh:mm - DD/MM/YYYY",
                         )}`}
                       </TableCell>
+                      <TableCell align="left">
+                        <IconButton
+                          className={cx("actionItem")}
+                          onClick={handleShowAction(row._id)}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                      </TableCell>
+
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleCloseMenu}
+                        anchorOrigin={{
+                          vertical: "center",
+                          horizontal: "left",
+                        }}
+                        transformOrigin={{
+                          vertical: "center",
+                          horizontal: "right",
+                        }}
+                        classes={{ paper: cx("paperOfMenu") }}
+                      >
+                        <MenuItem
+                          onClick={handleCloseMenu}
+                          className={cx("menuItem")}
+                        >
+                          <DeleteOutlineIcon className={cx("delete", "icon")} />
+                          <p className={cx("delete")}>Delete</p>
+                        </MenuItem>
+                        <MenuItem
+                          onClick={handleToEditPage}
+                          className={cx("menuItem")}
+                        >
+                          <EditIcon className={cx("icon")} />
+                          <p>Edit</p>
+                        </MenuItem>
+                      </Menu>
                     </TableRow>
                   );
-                },
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
       </Paper>
     </Box>
   );

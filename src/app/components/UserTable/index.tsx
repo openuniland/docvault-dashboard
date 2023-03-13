@@ -94,7 +94,6 @@ const headCells: readonly HeadCell[] = [
     id: "_id",
     numeric: false,
     disablePadding: false,
-    sortable: true,
     label: "",
   },
 ];

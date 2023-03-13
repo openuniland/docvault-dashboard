@@ -27,6 +27,7 @@ import {
   LinearProgress,
   Menu,
   MenuItem,
+  Switch,
   Tab,
   Tabs,
   TextField,
@@ -35,27 +36,27 @@ import {
   Typography,
 } from "@mui/material";
 
-import { User } from "types/User";
-import styles from "./UserTable.module.scss";
+import { Subject } from "types/Subject";
+import styles from "./SubjectTable.module.scss";
 
 const cx = classNames.bind(styles);
 
 type Order = "asc" | "desc";
 
 function changeData(
-  array: User[],
+  array: Subject[],
   tab: number = 0,
-  orderBy: keyof User = "fullname",
+  orderBy: keyof Subject = "subject_name",
   order: Order = "asc",
-): User[] {
+): Subject[] {
   let newArray = [...array];
 
   switch (tab) {
     case 1:
-      newArray = newArray.filter(item => item.roles === "ADMIN");
+      newArray = newArray.filter(item => item.is_approved === true);
       break;
     case 2:
-      newArray = newArray.filter(item => item.roles === "USER");
+      newArray = newArray.filter(item => item.is_approved === false);
       break;
     default:
       break;
@@ -65,9 +66,7 @@ function changeData(
     const compare = (a: string, b: string) => a.localeCompare(b);
 
     switch (orderBy) {
-      case "_id":
-      case "fullname":
-      case "email":
+      case "subject_name":
         const valA = String(itemA[orderBy]);
         const valB = String(itemB[orderBy]);
         return order === "asc" ? compare(valA, valB) : compare(valB, valA);
@@ -85,7 +84,7 @@ function changeData(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof User;
+  id: keyof Subject;
   label: string;
   numeric: boolean;
   sortable?: boolean;
@@ -99,37 +98,25 @@ const headCells: readonly HeadCell[] = [
     label: "ID",
   },
   {
-    id: "fullname",
+    id: "subject_name",
     numeric: false,
     disablePadding: false,
     sortable: true,
-    label: "Full Name",
+    label: "Subject Name",
   },
   {
-    id: "email",
+    id: "is_approved",
     numeric: false,
     disablePadding: false,
     sortable: true,
-    label: "Email",
-  },
-  {
-    id: "roles",
-    numeric: false,
-    disablePadding: false,
-    label: "Role",
-  },
-  {
-    id: "is_blocked",
-    numeric: false,
-    disablePadding: false,
-    label: "Is Blocked",
+    label: "Is Approved",
   },
   {
     id: "updated_at",
     numeric: false,
     disablePadding: false,
     sortable: true,
-    label: "Created At",
+    label: "Updated At",
   },
   {
     id: "_id",
@@ -143,7 +130,7 @@ interface TableHeadProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof User,
+    property: keyof Subject,
   ) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
@@ -162,7 +149,7 @@ const EnhancedTableHead = (props: TableHeadProps) => {
   } = props;
 
   const createSortHandler =
-    (property: keyof User) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof Subject) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
@@ -255,17 +242,17 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 }
 
 interface Props {
-  rows?: User[];
+  rows?: Subject[];
   isLoading?: boolean;
 }
 
-export const UsersTable = (props: Props) => {
+export const SubjectTable = (props: Props) => {
   const { rows = [], isLoading = false } = props;
 
   const navigate = useNavigate();
 
   const [order, setOrder] = useState<Order>("asc");
-  const [orderBy, setOrderBy] = useState<keyof User>("fullname");
+  const [orderBy, setOrderBy] = useState<keyof Subject>("subject_name");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [valueOfTab, setValueOfTab] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -285,7 +272,7 @@ export const UsersTable = (props: Props) => {
   );
 
   const handleRequestSort = useCallback(
-    (event: React.MouseEvent<unknown>, property: keyof User) => {
+    (event: React.MouseEvent<unknown>, property: keyof Subject) => {
       const isAsc = orderBy === property && order === "asc";
       setOrder(isAsc ? "desc" : "asc");
       setOrderBy(property);
@@ -346,6 +333,13 @@ export const UsersTable = (props: Props) => {
     navigate(`/users/edit/${editId}`);
   }, [navigate, editId]);
 
+  const handleToggleApprove = useCallback(
+    (id: string) => () => {
+      console.log("Togle approve", id);
+    },
+    [],
+  );
+
   return (
     <Box className={cx("container")}>
       {isLoading && <LinearProgress />}
@@ -358,8 +352,8 @@ export const UsersTable = (props: Props) => {
             classes={{ indicator: cx("indicator") }}
           >
             <Tab label="All" classes={{ selected: cx("selected") }} />
-            <Tab label="ADMIN" classes={{ selected: cx("selected") }} />
-            <Tab label="USER" classes={{ selected: cx("selected") }} />
+            <Tab label="APPROVED" classes={{ selected: cx("selected") }} />
+            <Tab label="NOT APPROVED" classes={{ selected: cx("selected") }} />
           </Tabs>
         </Box>
         <Box
@@ -408,12 +402,15 @@ export const UsersTable = (props: Props) => {
                       <TableCell component="th" scope="row" padding="none">
                         {row._id}
                       </TableCell>
-                      <TableCell align="left">{row.fullname}</TableCell>
-                      <TableCell align="left">{row.email}</TableCell>
-                      <TableCell align="left">{row.roles}</TableCell>
-                      <TableCell align="left">{`${row.is_blocked}`}</TableCell>
+                      <TableCell align="left">{row.subject_name}</TableCell>
                       <TableCell align="left">
-                        {`${moment(row.created_at).format(
+                        <Switch
+                          checked={row.is_approved}
+                          onChange={handleToggleApprove(row._id)}
+                        />
+                      </TableCell>
+                      <TableCell align="left">
+                        {`${moment(row.updated_at).format(
                           "hh:mm - DD/MM/YYYY",
                         )}`}
                       </TableCell>

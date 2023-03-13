@@ -3,15 +3,15 @@ import { Box, Breadcrumbs, Button, Typography } from "@mui/material";
 import classNames from "classnames/bind";
 import { useCallback } from "react";
 
-import { useGetAllUsers } from "queries/user";
-import { UsersTable } from "app/components/UserTable";
-import styles from "./UserWrapper.module.scss";
+import { SubjectTable } from "app/components/SubjectTable";
+import styles from "./SubjectWrapper.module.scss";
+import { useGetAllSubjects } from "queries/subject";
 
 const cx = classNames.bind(styles);
 
-export const UserWrapper = () => {
+export const SubjectWrapper = () => {
   const navigate = useNavigate();
-  const { data: users, isLoading } = useGetAllUsers();
+  const { data: subjects, isLoading } = useGetAllSubjects();
 
   const handleToAddUserPage = useCallback(() => {
     navigate("/users/new");
@@ -23,8 +23,8 @@ export const UserWrapper = () => {
           <Link className={cx("link")} to="/">
             Dashboard
           </Link>
-          <Link className={cx("link")} to="/users">
-            User
+          <Link className={cx("link")} to="/subjects">
+            Subject
           </Link>
           <Typography className={cx("current")}>List</Typography>
         </Breadcrumbs>
@@ -34,10 +34,10 @@ export const UserWrapper = () => {
           sx={{ mr: 1 }}
           onClick={handleToAddUserPage}
         >
-          Thêm mới người dùng
+          Thêm môn học
         </Button>
       </Box>
-      <UsersTable rows={users} isLoading={isLoading} />
+      <SubjectTable rows={subjects} isLoading={isLoading} />
     </div>
   );
 };

@@ -27,9 +27,9 @@ http.interceptors.response.use(
   },
   async function (error: any) {
     const { config, response } = error;
-    const errorMessage = response?.data?.message;
+    const errorCode = response?.data?.errors?.errorCode;
 
-    if (errorMessage === "jwt expired") {
+    if (errorCode === "TOKEN_EXPIRED") {
       const apiResponseData = await handleRefreshToken({
         baseURL: config.baseURL,
         url: config.url,
@@ -39,9 +39,10 @@ http.interceptors.response.use(
       return apiResponseData;
     }
 
-    removeItemFromStorage("tokens");
-    removeItemFromStorage("userData");
-    window.location.replace("/");
+    if (errorCode === "INVALID_TOKEN") {
+      removeItemFromStorage("tokens");
+      window.location.replace("/");
+    }
 
     return Promise.reject(error?.response?.data);
   },

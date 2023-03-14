@@ -6,6 +6,7 @@ import { withAppHeader, withSidebar } from "../hocs";
 import { AddUserPage } from "app/pages/AddUserPage";
 import { EditUserPage } from "app/pages/EditUserPage";
 import { SubjectPage } from "app/pages/SubjectPage";
+import { DocumentPage } from "app/pages/DocumentPage";
 
 const Pages = {
   Guards: Guards,
@@ -13,6 +14,7 @@ const Pages = {
   AddUserPage: withSidebar(withAppHeader(AddUserPage)),
   EditUserPage: withSidebar(withAppHeader(EditUserPage)),
   SubjectPage: withSidebar(withAppHeader(SubjectPage)),
+  DocumentPage: withSidebar(withAppHeader(DocumentPage)),
 };
 
 const Layout = () => {
@@ -23,6 +25,7 @@ const Layout = () => {
       <Route path="/users/new" element={<Pages.AddUserPage />} />
       <Route path="/users/edit/:userId" element={<Pages.EditUserPage />} />
       <Route path="/subjects" element={<Pages.SubjectPage />} />
+      <Route path="/documents" element={<Pages.DocumentPage />} />
     </Routes>
   );
 };

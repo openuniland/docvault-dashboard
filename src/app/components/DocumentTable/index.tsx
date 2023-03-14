@@ -36,19 +36,19 @@ import {
   Typography,
 } from "@mui/material";
 
-import { Subject } from "types/Subject";
-import styles from "./SubjectTable.module.scss";
+import { DocumentModel } from "types/DocumentModel";
+import styles from "./DocumentTable.module.scss";
 
 const cx = classNames.bind(styles);
 
 type Order = "asc" | "desc";
 
 function changeData(
-  array: Subject[],
+  array: DocumentModel[],
   tab: number = 0,
-  orderBy: keyof Subject = "subject_name",
+  orderBy: keyof DocumentModel = "created_at",
   order: Order = "asc",
-): Subject[] {
+): DocumentModel[] {
   let newArray = [...array];
 
   switch (tab) {
@@ -66,14 +66,14 @@ function changeData(
     const compare = (a: string, b: string) => a.localeCompare(b);
 
     switch (orderBy) {
-      case "subject_name":
+      case "title":
         const valA = String(itemA[orderBy]);
         const valB = String(itemB[orderBy]);
         return order === "asc" ? compare(valA, valB) : compare(valB, valA);
-      case "updated_at":
+      case "created_at":
         return order === "asc"
-          ? moment(itemA.updated_at).diff(moment(itemB.updated_at))
-          : moment(itemB.updated_at).diff(moment(itemA.updated_at));
+          ? moment(itemA.created_at).diff(moment(itemB.created_at))
+          : moment(itemB.created_at).diff(moment(itemA.created_at));
       default:
         return 0;
     }
@@ -84,7 +84,7 @@ function changeData(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof Subject;
+  id: keyof DocumentModel;
   label: string;
   numeric: boolean;
   sortable?: boolean;
@@ -92,31 +92,32 @@ interface HeadCell {
 
 const headCells: readonly HeadCell[] = [
   {
-    id: "_id",
+    id: "author",
     numeric: false,
-    disablePadding: true,
-    label: "ID",
+    disablePadding: false,
+    sortable: false,
+    label: "Author",
   },
   {
-    id: "subject_name",
+    id: "title",
     numeric: false,
     disablePadding: false,
     sortable: true,
-    label: "Subject Name",
+    label: "Title",
   },
   {
     id: "is_approved",
     numeric: false,
     disablePadding: false,
-    sortable: true,
+    sortable: false,
     label: "Is Approved",
   },
   {
-    id: "updated_at",
+    id: "created_at",
     numeric: false,
     disablePadding: false,
     sortable: true,
-    label: "Updated At",
+    label: "Created At",
   },
   {
     id: "_id",
@@ -130,7 +131,7 @@ interface TableHeadProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof Subject,
+    property: keyof DocumentModel,
   ) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
@@ -149,7 +150,7 @@ const EnhancedTableHead = (props: TableHeadProps) => {
   } = props;
 
   const createSortHandler =
-    (property: keyof Subject) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof DocumentModel) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
@@ -221,7 +222,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           id="tableTitle"
           component="div"
         >
-          Danh sách người dùng
+          Danh sách tài liệu
         </Typography>
       )}
       {numSelected > 0 ? (
@@ -242,18 +243,18 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 }
 
 interface Props {
-  rows?: Subject[];
+  rows?: DocumentModel[];
   isLoading?: boolean;
   onApprove?: (id: string, is_approved: boolean) => void;
 }
 
-export const SubjectTable = (props: Props) => {
+export const DocumentTable = (props: Props) => {
   const { rows = [], isLoading = false, onApprove = () => {} } = props;
 
   const navigate = useNavigate();
 
   const [order, setOrder] = useState<Order>("desc");
-  const [orderBy, setOrderBy] = useState<keyof Subject>("updated_at");
+  const [orderBy, setOrderBy] = useState<keyof DocumentModel>("created_at");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [valueOfTab, setValueOfTab] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -273,7 +274,7 @@ export const SubjectTable = (props: Props) => {
   );
 
   const handleRequestSort = useCallback(
-    (event: React.MouseEvent<unknown>, property: keyof Subject) => {
+    (event: React.MouseEvent<unknown>, property: keyof DocumentModel) => {
       const isAsc = orderBy === property && order === "asc";
       setOrder(isAsc ? "desc" : "asc");
       setOrderBy(property);
@@ -401,9 +402,9 @@ export const SubjectTable = (props: Props) => {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row" padding="none">
-                        {row._id}
+                        {row.author?.fullname}
                       </TableCell>
-                      <TableCell align="left">{row.subject_name}</TableCell>
+                      <TableCell align="left">{row.title}</TableCell>
                       <TableCell align="left">
                         <Switch
                           checked={row.is_approved}
@@ -414,7 +415,7 @@ export const SubjectTable = (props: Props) => {
                         />
                       </TableCell>
                       <TableCell align="left">
-                        {`${moment(row.updated_at).format(
+                        {`${moment(row.created_at).format(
                           "hh:mm - DD/MM/YYYY",
                         )}`}
                       </TableCell>

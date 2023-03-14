@@ -5,14 +5,14 @@ import configs from "configs";
 import { getTokens, removeItemFromStorage, setTokens } from "utils/storage";
 import http from "./http";
 
-const { refreshToken } = getTokens();
-
 async function handleRefreshToken({
   method,
   data,
   url,
   baseURL,
 }: AxiosRequestConfig) {
+  const { refreshToken } = getTokens();
+
   const response = await axios.post(
     `${configs.apiEndpoint}/auth/refresh-token`,
     {
@@ -41,6 +41,7 @@ async function handleRefreshToken({
       data: data,
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
       },
     });
   }

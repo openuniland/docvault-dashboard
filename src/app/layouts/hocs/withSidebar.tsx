@@ -9,7 +9,6 @@ const withSidebar = (WrappedComponent: React.ComponentType) => {
         <div
           style={{
             flex: 1,
-            overflowY: "scroll",
           }}
         >
           <WrappedComponent {...props} />

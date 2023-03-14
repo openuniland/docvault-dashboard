@@ -23,6 +23,7 @@ interface Props {
   actionDefault?: boolean;
   contentText?: string;
   loading?: boolean;
+  className?: string;
 }
 
 export const ModalCustomization = (props: Props) => {
@@ -36,42 +37,42 @@ export const ModalCustomization = (props: Props) => {
     actionDefault,
     contentText,
     loading,
+    className,
   } = props;
   return (
-    <div className={cx("container")}>
-      <Dialog
-        open={open}
-        onClose={handleCancel}
-        BackdropProps={{
-          timeout,
-        }}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        {title && <DialogTitle id="alert-dialog-title">{title}</DialogTitle>}
+    <Dialog
+      open={open}
+      onClose={handleCancel}
+      BackdropProps={{
+        timeout,
+      }}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      classes={{ paper: cx("container", className) }}
+    >
+      {title && <DialogTitle id="alert-dialog-title">{title}</DialogTitle>}
 
-        <DialogContent>
-          {contentText && <DialogContentText>{contentText}</DialogContentText>}
+      <DialogContent>
+        {contentText && <DialogContentText>{contentText}</DialogContentText>}
 
-          {children}
-        </DialogContent>
+        {children}
+      </DialogContent>
 
-        {actionDefault && (
-          <DialogActions>
-            <Button size="medium" onClick={handleCancel} variant="outlined">
-              Cancel
-            </Button>
-            <LoadingButton
-              size="medium"
-              onClick={handleAgree}
-              loading={loading}
-              variant="contained"
-            >
-              Agree
-            </LoadingButton>
-          </DialogActions>
-        )}
-      </Dialog>
-    </div>
+      {actionDefault && (
+        <DialogActions>
+          <Button size="medium" onClick={handleCancel} variant="outlined">
+            Cancel
+          </Button>
+          <LoadingButton
+            size="medium"
+            onClick={handleAgree}
+            loading={loading}
+            variant="contained"
+          >
+            Agree
+          </LoadingButton>
+        </DialogActions>
+      )}
+    </Dialog>
   );
 };

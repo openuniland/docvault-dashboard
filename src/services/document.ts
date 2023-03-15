@@ -1,6 +1,10 @@
 import { AxiosResponse } from "axios";
 
-import { ApproveTheDocumentPayload, DocumentModel } from "types/DocumentModel";
+import {
+  ApproveTheDocumentPayload,
+  CreateTheDocumentPayload,
+  DocumentModel,
+} from "types/DocumentModel";
 import {} from "types/Subject";
 
 import http from "utils/api/http";
@@ -19,6 +23,17 @@ export const approveTheDocument = async (
     {
       is_approved: payload.is_approved,
     },
+  );
+
+  return response?.data?.data;
+};
+
+export const createTheDocument = async (
+  payload: CreateTheDocumentPayload,
+): Promise<DocumentModel> => {
+  const response: AxiosResponse = await http.post(
+    `/administrator/documents`,
+    payload,
   );
 
   return response?.data?.data;

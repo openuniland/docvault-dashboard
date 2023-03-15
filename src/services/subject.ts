@@ -13,6 +13,12 @@ export const getAllSubjects = async (): Promise<Subject[]> => {
   return response?.data?.data;
 };
 
+export const getAllSubjectsApproved = async (): Promise<Subject[]> => {
+  const response: AxiosResponse = await http.get("/subjects?is_approved=true");
+
+  return response?.data?.data;
+};
+
 export const approveTheSubject = async (
   payload: ApproveTheSubjectPayload,
 ): Promise<Subject[]> => {

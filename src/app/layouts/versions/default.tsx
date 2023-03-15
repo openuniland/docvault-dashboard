@@ -7,6 +7,7 @@ import { AddUserPage } from "app/pages/AddUserPage";
 import { EditUserPage } from "app/pages/EditUserPage";
 import { SubjectPage } from "app/pages/SubjectPage";
 import { DocumentPage } from "app/pages/DocumentPage";
+import { NewDocumentPage } from "app/pages/NewDocumentPage";
 
 const Pages = {
   Guards: Guards,
@@ -15,6 +16,7 @@ const Pages = {
   EditUserPage: withSidebar(withAppHeader(EditUserPage)),
   SubjectPage: withSidebar(withAppHeader(SubjectPage)),
   DocumentPage: withSidebar(withAppHeader(DocumentPage)),
+  NewDocumentPage: withSidebar(withAppHeader(NewDocumentPage)),
 };
 
 const Layout = () => {
@@ -26,6 +28,7 @@ const Layout = () => {
       <Route path="/users/edit/:userId" element={<Pages.EditUserPage />} />
       <Route path="/subjects" element={<Pages.SubjectPage />} />
       <Route path="/documents" element={<Pages.DocumentPage />} />
+      <Route path="/documents/new" element={<Pages.NewDocumentPage />} />
     </Routes>
   );
 };

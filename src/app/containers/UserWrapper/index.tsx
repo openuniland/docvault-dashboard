@@ -48,7 +48,6 @@ export const UserWrapper = () => {
 
     return Math.ceil(total / pageSize);
   }, [users?.meta?.total]);
-
   return (
     <div className={cx("container")}>
       <Box className={cx("boxHeader")}>

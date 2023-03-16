@@ -9,7 +9,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
 import { visuallyHidden } from "@mui/utils";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import classNames from "classnames/bind";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -43,45 +43,6 @@ const cx = classNames.bind(styles);
 
 type Order = "asc" | "desc";
 
-function changeData(
-  array: Subject[],
-  tab: number = 0,
-  orderBy: keyof Subject = "subject_name",
-  order: Order = "asc",
-): Subject[] {
-  let newArray = [...array];
-
-  switch (tab) {
-    case 1:
-      newArray = newArray.filter(item => item.is_approved === true);
-      break;
-    case 2:
-      newArray = newArray.filter(item => item.is_approved === false);
-      break;
-    default:
-      break;
-  }
-
-  newArray.sort((itemA, itemB) => {
-    const compare = (a: string, b: string) => a.localeCompare(b);
-
-    switch (orderBy) {
-      case "subject_name":
-        const valA = String(itemA[orderBy]);
-        const valB = String(itemB[orderBy]);
-        return order === "asc" ? compare(valA, valB) : compare(valB, valA);
-      case "updated_at":
-        return order === "asc"
-          ? moment(itemA.updated_at).diff(moment(itemB.updated_at))
-          : moment(itemB.updated_at).diff(moment(itemA.updated_at));
-      default:
-        return 0;
-    }
-  });
-
-  return newArray;
-}
-
 interface HeadCell {
   disablePadding: boolean;
   id: keyof Subject;
@@ -108,7 +69,6 @@ const headCells: readonly HeadCell[] = [
     id: "is_approved",
     numeric: false,
     disablePadding: false,
-    sortable: true,
     label: "Is Approved",
   },
   {
@@ -252,6 +212,7 @@ export const SubjectTable = (props: Props) => {
 
   const navigate = useNavigate();
 
+  const [subjects, setSubjects] = useState<Subject[]>(rows);
   const [order, setOrder] = useState<Order>("desc");
   const [orderBy, setOrderBy] = useState<keyof Subject>("updated_at");
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -263,22 +224,13 @@ export const SubjectTable = (props: Props) => {
   const handleSelectAllClick = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.checked) {
-        const newSelected = rows.map(n => n._id);
+        const newSelected = subjects.map(n => n._id);
         setSelected(newSelected);
         return;
       }
       setSelected([]);
     },
-    [selected, rows],
-  );
-
-  const handleRequestSort = useCallback(
-    (event: React.MouseEvent<unknown>, property: keyof Subject) => {
-      const isAsc = orderBy === property && order === "asc";
-      setOrder(isAsc ? "desc" : "asc");
-      setOrderBy(property);
-    },
-    [orderBy, order],
+    [selected, subjects],
   );
 
   const handleClick = useCallback(
@@ -311,11 +263,68 @@ export const SubjectTable = (props: Props) => {
     [selected],
   );
 
-  const HandleChangeTab = useCallback(
-    (event: React.SyntheticEvent, newValue: number) => {
-      setValueOfTab(newValue);
+  const handleChangeTab = useCallback(
+    (event: React.SyntheticEvent, tabIndex: number) => {
+      setValueOfTab(tabIndex);
+      let newArray = [...rows];
+
+      switch (tabIndex) {
+        case 1:
+          newArray = newArray.filter(item => item.is_approved === true);
+          break;
+        case 2:
+          newArray = newArray.filter(item => item.is_approved === false);
+          break;
+        default:
+          break;
+      }
+
+      setSubjects(newArray);
     },
-    [valueOfTab],
+    [valueOfTab, rows],
+  );
+
+  const handleSort = useCallback(
+    (newOrder: Order, newOrderBy: keyof Subject, newDocuments: Subject[]) => {
+      let newArray = [...newDocuments];
+
+      newArray.sort((itemA, itemB) => {
+        const compare = (a: string, b: string) => a.localeCompare(b);
+
+        switch (newOrderBy) {
+          case "subject_name":
+            const valA = String(itemA[newOrderBy]);
+            const valB = String(itemB[newOrderBy]);
+            return newOrder === "asc"
+              ? compare(valA, valB)
+              : compare(valB, valA);
+          case "updated_at":
+            return newOrder === "asc"
+              ? moment(itemA.updated_at).diff(moment(itemB.updated_at))
+              : moment(itemB.updated_at).diff(moment(itemA.updated_at));
+          default:
+            return 0;
+        }
+      });
+
+      return newArray;
+    },
+    [order, orderBy, subjects],
+  );
+
+  const handleRequestSort = useCallback(
+    (event: React.MouseEvent<unknown>, property: keyof Subject) => {
+      const isAsc = orderBy === property && order === "asc";
+      const newOrder = isAsc ? "desc" : "asc";
+      const newOrderBy = property;
+      setOrder(newOrder);
+      setOrderBy(newOrderBy);
+
+      const data = handleSort(newOrder, newOrderBy, subjects);
+
+      setSubjects(data);
+    },
+    [subjects, order, orderBy],
   );
 
   const handleShowAction = useCallback(
@@ -341,6 +350,11 @@ export const SubjectTable = (props: Props) => {
     [],
   );
 
+  useEffect(() => {
+    const data = handleSort(order, orderBy, rows);
+    setSubjects(data);
+  }, [rows]);
+
   return (
     <Box className={cx("container")}>
       {isLoading && <LinearProgress />}
@@ -348,7 +362,7 @@ export const SubjectTable = (props: Props) => {
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs
             value={valueOfTab}
-            onChange={HandleChangeTab}
+            onChange={handleChangeTab}
             className={cx("tabs")}
             classes={{ indicator: cx("indicator") }}
           >
@@ -375,7 +389,7 @@ export const SubjectTable = (props: Props) => {
         </Box>
         <Paper>
           <EnhancedTableToolbar numSelected={selected.length} />
-          <TableContainer>
+          <TableContainer className={cx("tableContainer")}>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
               <EnhancedTableHead
                 numSelected={selected.length}
@@ -386,7 +400,7 @@ export const SubjectTable = (props: Props) => {
                 rowCount={rows.length}
               />
               <TableBody>
-                {changeData(rows, valueOfTab, orderBy, order).map(row => {
+                {subjects.map(row => {
                   const isItemSelected = isSelected(row._id);
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>

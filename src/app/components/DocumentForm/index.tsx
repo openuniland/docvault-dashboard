@@ -91,6 +91,13 @@ export const DocumentForm = (props: Props) => {
     [content, resetContent],
   );
 
+  const handleDeleteContent = useCallback(
+    (index: number) => {
+      setContent(prev => prev.filter((_, i) => i !== index));
+    },
+    [content],
+  );
+
   return (
     <div className={cx("container")}>
       <Box className={cx("formWrapper")}>
@@ -220,7 +227,7 @@ export const DocumentForm = (props: Props) => {
           </form>
         </Paper>
 
-        <RenderContent content={content} />
+        <RenderContent content={content} onDelete={handleDeleteContent} />
       </Box>
       <Box className={cx("subForm")}>
         <Paper elevation={3} className={cx("subPaper")}>

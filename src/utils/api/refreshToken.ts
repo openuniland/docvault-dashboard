@@ -10,6 +10,7 @@ async function handleRefreshToken({
   data,
   url,
   baseURL,
+  params,
 }: AxiosRequestConfig) {
   const { refreshToken } = getTokens();
 
@@ -39,6 +40,7 @@ async function handleRefreshToken({
       baseURL: baseURL,
       method: method,
       data: data,
+      params: params,
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",

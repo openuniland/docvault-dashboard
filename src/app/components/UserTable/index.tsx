@@ -9,7 +9,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
 import { visuallyHidden } from "@mui/utils";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import classNames from "classnames/bind";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -42,47 +42,6 @@ const cx = classNames.bind(styles);
 
 type Order = "asc" | "desc";
 
-function changeData(
-  array: User[],
-  tab: number = 0,
-  orderBy: keyof User = "fullname",
-  order: Order = "asc",
-): User[] {
-  let newArray = [...array];
-
-  switch (tab) {
-    case 1:
-      newArray = newArray.filter(item => item.roles === "ADMIN");
-      break;
-    case 2:
-      newArray = newArray.filter(item => item.roles === "USER");
-      break;
-    default:
-      break;
-  }
-
-  newArray.sort((itemA, itemB) => {
-    const compare = (a: string, b: string) => a.localeCompare(b);
-
-    switch (orderBy) {
-      case "_id":
-      case "fullname":
-      case "email":
-        const valA = String(itemA[orderBy]);
-        const valB = String(itemB[orderBy]);
-        return order === "asc" ? compare(valA, valB) : compare(valB, valA);
-      case "updated_at":
-        return order === "asc"
-          ? moment(itemA.updated_at).diff(moment(itemB.updated_at))
-          : moment(itemB.updated_at).diff(moment(itemA.updated_at));
-      default:
-        return 0;
-    }
-  });
-
-  return newArray;
-}
-
 interface HeadCell {
   disablePadding: boolean;
   id: keyof User;
@@ -92,12 +51,6 @@ interface HeadCell {
 }
 
 const headCells: readonly HeadCell[] = [
-  {
-    id: "_id",
-    numeric: false,
-    disablePadding: true,
-    label: "ID",
-  },
   {
     id: "fullname",
     numeric: false,
@@ -129,7 +82,7 @@ const headCells: readonly HeadCell[] = [
     numeric: false,
     disablePadding: false,
     sortable: true,
-    label: "Created At",
+    label: "Updated At",
   },
   {
     id: "_id",
@@ -161,10 +114,12 @@ const EnhancedTableHead = (props: TableHeadProps) => {
     onRequestSort,
   } = props;
 
-  const createSortHandler =
+  const createSortHandler = useCallback(
     (property: keyof User) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
-    };
+    },
+    [],
+  );
 
   return (
     <TableHead className={cx("tableHead")}>
@@ -264,6 +219,7 @@ export const UsersTable = (props: Props) => {
 
   const navigate = useNavigate();
 
+  const [users, setUsers] = useState<User[]>(rows);
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof User>("fullname");
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -274,23 +230,61 @@ export const UsersTable = (props: Props) => {
 
   const handleSelectAllClick = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSelected([]);
       if (event.target.checked) {
-        const newSelected = rows.map(n => n._id);
+        const newSelected = users.map(n => n._id);
         setSelected(newSelected);
         return;
       }
+
       setSelected([]);
     },
-    [selected, rows],
+    [selected, users],
+  );
+  console.log("selected", selected);
+
+  const handleSort = useCallback(
+    (newOrder: Order, newOrderBy: keyof User, newDocuments: User[]) => {
+      let newArray = [...newDocuments];
+
+      newArray.sort((itemA, itemB) => {
+        const compare = (a: string, b: string) => a.localeCompare(b);
+
+        switch (newOrderBy) {
+          case "fullname":
+          case "email":
+            const valA = String(itemA[newOrderBy]);
+            const valB = String(itemB[newOrderBy]);
+            return newOrder === "asc"
+              ? compare(valA, valB)
+              : compare(valB, valA);
+          case "updated_at":
+            return newOrder === "asc"
+              ? moment(itemA.created_at).diff(moment(itemB.created_at))
+              : moment(itemB.created_at).diff(moment(itemA.created_at));
+          default:
+            return 0;
+        }
+      });
+
+      return newArray;
+    },
+    [order, orderBy, users],
   );
 
   const handleRequestSort = useCallback(
     (event: React.MouseEvent<unknown>, property: keyof User) => {
       const isAsc = orderBy === property && order === "asc";
-      setOrder(isAsc ? "desc" : "asc");
-      setOrderBy(property);
+      const newOrder = isAsc ? "desc" : "asc";
+      const newOrderBy = property;
+      setOrder(newOrder);
+      setOrderBy(newOrderBy);
+
+      const data = handleSort(newOrder, newOrderBy, users);
+
+      setUsers(data);
     },
-    [orderBy, order],
+    [users, order, orderBy],
   );
 
   const handleClick = useCallback(
@@ -323,13 +317,6 @@ export const UsersTable = (props: Props) => {
     [selected],
   );
 
-  const HandleChangeTab = useCallback(
-    (event: React.SyntheticEvent, newValue: number) => {
-      setValueOfTab(newValue);
-    },
-    [valueOfTab],
-  );
-
   const handleShowAction = useCallback(
     (id: string) => (event: React.MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
@@ -346,6 +333,32 @@ export const UsersTable = (props: Props) => {
     navigate(`/users/edit/${editId}`);
   }, [navigate, editId]);
 
+  useEffect(() => {
+    const data = handleSort(order, orderBy, rows);
+    setUsers(data);
+  }, [rows]);
+
+  const handleChangeTab = useCallback(
+    (event: React.SyntheticEvent, tabIndex: number) => {
+      setValueOfTab(tabIndex);
+      let newArray = [...rows];
+
+      switch (tabIndex) {
+        case 1:
+          newArray = newArray.filter(item => item.roles === "ADMIN");
+          break;
+        case 2:
+          newArray = newArray.filter(item => item.roles === "USER");
+          break;
+        default:
+          break;
+      }
+
+      setUsers(newArray);
+    },
+    [valueOfTab, rows],
+  );
+
   return (
     <Box className={cx("container")}>
       {isLoading && <LinearProgress />}
@@ -353,7 +366,7 @@ export const UsersTable = (props: Props) => {
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs
             value={valueOfTab}
-            onChange={HandleChangeTab}
+            onChange={handleChangeTab}
             className={cx("tabs")}
             classes={{ indicator: cx("indicator") }}
           >
@@ -380,7 +393,7 @@ export const UsersTable = (props: Props) => {
         </Box>
         <Paper>
           <EnhancedTableToolbar numSelected={selected.length} />
-          <TableContainer>
+          <TableContainer className={cx("tableContainer")}>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
               <EnhancedTableHead
                 numSelected={selected.length}
@@ -391,7 +404,7 @@ export const UsersTable = (props: Props) => {
                 rowCount={rows.length}
               />
               <TableBody>
-                {changeData(rows, valueOfTab, orderBy, order).map(row => {
+                {users.map(row => {
                   const isItemSelected = isSelected(row._id);
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>
@@ -404,9 +417,6 @@ export const UsersTable = (props: Props) => {
                           checked={isItemSelected}
                           className={cx("checkbox")}
                         />
-                      </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
-                        {row._id}
                       </TableCell>
                       <TableCell align="left">{row.fullname}</TableCell>
                       <TableCell align="left">{row.email}</TableCell>

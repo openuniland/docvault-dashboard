@@ -9,7 +9,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import Checkbox from "@mui/material/Checkbox";
 import { visuallyHidden } from "@mui/utils";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import classNames from "classnames/bind";
 import moment from "moment";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -42,45 +42,6 @@ import styles from "./DocumentTable.module.scss";
 const cx = classNames.bind(styles);
 
 type Order = "asc" | "desc";
-
-function changeData(
-  array: DocumentModel[],
-  tab: number = 0,
-  orderBy: keyof DocumentModel = "created_at",
-  order: Order = "asc",
-): DocumentModel[] {
-  let newArray = [...array];
-
-  switch (tab) {
-    case 1:
-      newArray = newArray.filter(item => item.is_approved === true);
-      break;
-    case 2:
-      newArray = newArray.filter(item => item.is_approved === false);
-      break;
-    default:
-      break;
-  }
-
-  newArray.sort((itemA, itemB) => {
-    const compare = (a: string, b: string) => a.localeCompare(b);
-
-    switch (orderBy) {
-      case "title":
-        const valA = String(itemA[orderBy]);
-        const valB = String(itemB[orderBy]);
-        return order === "asc" ? compare(valA, valB) : compare(valB, valA);
-      case "created_at":
-        return order === "asc"
-          ? moment(itemA.created_at).diff(moment(itemB.created_at))
-          : moment(itemB.created_at).diff(moment(itemA.created_at));
-      default:
-        return 0;
-    }
-  });
-
-  return newArray;
-}
 
 interface HeadCell {
   disablePadding: boolean;
@@ -149,10 +110,12 @@ const EnhancedTableHead = (props: TableHeadProps) => {
     onRequestSort,
   } = props;
 
-  const createSortHandler =
+  const createSortHandler = useCallback(
     (property: keyof DocumentModel) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
-    };
+    },
+    [],
+  );
 
   return (
     <TableHead className={cx("tableHead")}>
@@ -253,6 +216,7 @@ export const DocumentTable = (props: Props) => {
 
   const navigate = useNavigate();
 
+  const [documents, setDocuments] = useState<DocumentModel[]>(rows);
   const [order, setOrder] = useState<Order>("desc");
   const [orderBy, setOrderBy] = useState<keyof DocumentModel>("created_at");
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -264,22 +228,60 @@ export const DocumentTable = (props: Props) => {
   const handleSelectAllClick = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.checked) {
-        const newSelected = rows.map(n => n._id);
+        const newSelected = documents.map(n => n._id);
         setSelected(newSelected);
         return;
       }
       setSelected([]);
     },
-    [selected, rows],
+    [selected, documents],
+  );
+
+  const handleSort = useCallback(
+    (
+      newOrder: Order,
+      newOrderBy: keyof DocumentModel,
+      newDocuments: DocumentModel[],
+    ) => {
+      let newArray = [...newDocuments];
+
+      newArray.sort((itemA, itemB) => {
+        const compare = (a: string, b: string) => a.localeCompare(b);
+
+        switch (newOrderBy) {
+          case "title":
+            const valA = String(itemA[newOrderBy]);
+            const valB = String(itemB[newOrderBy]);
+            return newOrder === "asc"
+              ? compare(valA, valB)
+              : compare(valB, valA);
+          case "created_at":
+            return newOrder === "asc"
+              ? moment(itemA.created_at).diff(moment(itemB.created_at))
+              : moment(itemB.created_at).diff(moment(itemA.created_at));
+          default:
+            return 0;
+        }
+      });
+
+      return newArray;
+    },
+    [order, orderBy, documents],
   );
 
   const handleRequestSort = useCallback(
     (event: React.MouseEvent<unknown>, property: keyof DocumentModel) => {
       const isAsc = orderBy === property && order === "asc";
-      setOrder(isAsc ? "desc" : "asc");
-      setOrderBy(property);
+      const newOrder = isAsc ? "desc" : "asc";
+      const newOrderBy = property;
+      setOrder(newOrder);
+      setOrderBy(newOrderBy);
+
+      const data = handleSort(newOrder, newOrderBy, documents);
+
+      setDocuments(data);
     },
-    [orderBy, order],
+    [documents, order, orderBy],
   );
 
   const handleClick = useCallback(
@@ -312,13 +314,6 @@ export const DocumentTable = (props: Props) => {
     [selected],
   );
 
-  const HandleChangeTab = useCallback(
-    (event: React.SyntheticEvent, newValue: number) => {
-      setValueOfTab(newValue);
-    },
-    [valueOfTab],
-  );
-
   const handleShowAction = useCallback(
     (id: string) => (event: React.MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
@@ -342,6 +337,32 @@ export const DocumentTable = (props: Props) => {
     [],
   );
 
+  useEffect(() => {
+    const data = handleSort(order, orderBy, rows);
+    setDocuments(data);
+  }, [rows]);
+
+  const handleChangeTab = useCallback(
+    (event: React.SyntheticEvent, tabIndex: number) => {
+      setValueOfTab(tabIndex);
+      let newArray = [...rows];
+
+      switch (tabIndex) {
+        case 1:
+          newArray = newArray.filter(item => item.is_approved === true);
+          break;
+        case 2:
+          newArray = newArray.filter(item => item.is_approved === false);
+          break;
+        default:
+          break;
+      }
+
+      setDocuments(newArray);
+    },
+    [valueOfTab, rows],
+  );
+
   return (
     <Box className={cx("container")}>
       {isLoading && <LinearProgress />}
@@ -349,7 +370,7 @@ export const DocumentTable = (props: Props) => {
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs
             value={valueOfTab}
-            onChange={HandleChangeTab}
+            onChange={handleChangeTab}
             className={cx("tabs")}
             classes={{ indicator: cx("indicator") }}
           >
@@ -376,7 +397,7 @@ export const DocumentTable = (props: Props) => {
         </Box>
         <Paper>
           <EnhancedTableToolbar numSelected={selected.length} />
-          <TableContainer>
+          <TableContainer className={cx("tableContainer")}>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
               <EnhancedTableHead
                 numSelected={selected.length}
@@ -384,10 +405,10 @@ export const DocumentTable = (props: Props) => {
                 orderBy={orderBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={rows.length}
+                rowCount={documents.length}
               />
               <TableBody>
-                {changeData(rows, valueOfTab, orderBy, order).map(row => {
+                {documents.map(row => {
                   const isItemSelected = isSelected(row._id);
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>

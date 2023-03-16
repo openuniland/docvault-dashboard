@@ -35,6 +35,7 @@ http.interceptors.response.use(
         url: config.url,
         method: config.method,
         data: config.data,
+        params: config.params,
       });
       return apiResponseData;
     }

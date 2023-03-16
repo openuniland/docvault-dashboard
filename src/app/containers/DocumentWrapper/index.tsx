@@ -1,23 +1,32 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Box, Breadcrumbs, Button, Typography } from "@mui/material";
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  Pagination,
+  Typography,
+} from "@mui/material";
 import classNames from "classnames/bind";
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import styles from "./DocumentWrapper.module.scss";
 import { DocumentTable } from "app/components/DocumentTable";
 import { useGetAllDocument } from "queries/document";
 import { useApproveTheDocument } from "mutations/document";
+import { DEFAULT_PAGINATION } from "utils/constants";
 
 const cx = classNames.bind(styles);
 
 export const DocumentWrapper = () => {
   const navigate = useNavigate();
 
+  const [currentPage, setCurrentPage] = useState(1);
+
   const {
     data: documents,
     isLoading,
     refetch: refetchDocuments,
-  } = useGetAllDocument();
+  } = useGetAllDocument({ currentPage: currentPage - 1 });
 
   const { mutateAsync } = useApproveTheDocument();
 
@@ -46,6 +55,20 @@ export const DocumentWrapper = () => {
   const handleRedirectToCreateDocument = useCallback(() => {
     navigate(`/documents/new`);
   }, [navigate]);
+
+  const handlePagination = useCallback(
+    (_: React.ChangeEvent<unknown>, value: number) => {
+      setCurrentPage(value);
+    },
+    [currentPage],
+  );
+
+  const pageCount = useMemo(() => {
+    const total = documents?.meta?.total || 0;
+    const pageSize = DEFAULT_PAGINATION.pageSize;
+
+    return Math.ceil(total / pageSize);
+  }, [documents?.meta?.total]);
 
   return (
     <div className={cx("container")}>
@@ -77,10 +100,19 @@ export const DocumentWrapper = () => {
           </Button>
         </Box>
       </Box>
+
       <DocumentTable
-        rows={documents}
+        rows={documents?.data}
         isLoading={isLoading}
         onApprove={handleApproveTheSubject}
+      />
+
+      <Pagination
+        count={pageCount}
+        variant="outlined"
+        shape="rounded"
+        page={currentPage}
+        onChange={handlePagination}
       />
     </div>
   );

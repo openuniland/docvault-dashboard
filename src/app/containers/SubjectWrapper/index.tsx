@@ -1,17 +1,26 @@
 import { Link } from "react-router-dom";
-import { Box, Breadcrumbs, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  Pagination,
+  TextField,
+  Typography,
+} from "@mui/material";
 import classNames from "classnames/bind";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { SubjectTable } from "app/components/SubjectTable";
 import styles from "./SubjectWrapper.module.scss";
 import { useGetAllSubjects } from "queries/subject";
 import { useAddTheSubject, useApproveTheSubject } from "mutations/subject";
 import { ModalCustomization } from "app/components/ModalCustomization";
+import { DEFAULT_PAGINATION } from "utils/constants";
 
 const cx = classNames.bind(styles);
 
 export const SubjectWrapper = () => {
+  const [currentPage, setCurrentPage] = useState(1);
   const [openPropup, setOpenPropup] = useState(false);
   const [subjectName, setSubjectName] = useState("");
   const [responseError, setResponseError] = useState("");
@@ -20,7 +29,7 @@ export const SubjectWrapper = () => {
     data: subjects,
     isLoading,
     refetch: refetchSubjects,
-  } = useGetAllSubjects();
+  } = useGetAllSubjects({ currentPage: currentPage - 1 });
 
   const { mutateAsync } = useApproveTheSubject();
   const { mutateAsync: addNewSubject } = useAddTheSubject();
@@ -79,6 +88,24 @@ export const SubjectWrapper = () => {
     [subjectName],
   );
 
+  const handleRefreshSubjects = useCallback(() => {
+    refetchSubjects();
+  }, [refetchSubjects]);
+
+  const handlePagination = useCallback(
+    (_: React.ChangeEvent<unknown>, value: number) => {
+      setCurrentPage(value);
+    },
+    [currentPage],
+  );
+
+  const pageCount = useMemo(() => {
+    const total = subjects?.meta?.total || 0;
+    const pageSize = DEFAULT_PAGINATION.pageSize;
+
+    return Math.ceil(total / pageSize);
+  }, [subjects?.meta?.total]);
+
   return (
     <div className={cx("container")}>
       <Box className={cx("boxHeader")}>
@@ -91,19 +118,39 @@ export const SubjectWrapper = () => {
           </Link>
           <Typography className={cx("current")}>List</Typography>
         </Breadcrumbs>
-        <Button
-          className={cx("addUserBtn")}
-          variant="contained"
-          sx={{ mr: 1 }}
-          onClick={handleOpenPropup}
-        >
-          Thêm môn học
-        </Button>
+
+        <Box>
+          <Button
+            className={cx("addUserBtn")}
+            variant="contained"
+            sx={{ mr: 1 }}
+            onClick={handleRefreshSubjects}
+          >
+            Làm mới
+          </Button>
+          <Button
+            className={cx("addUserBtn")}
+            variant="contained"
+            sx={{ mr: 1 }}
+            onClick={handleOpenPropup}
+          >
+            Thêm môn học
+          </Button>
+        </Box>
       </Box>
+
       <SubjectTable
-        rows={subjects}
+        rows={subjects?.data}
         isLoading={isLoading}
         onApprove={handleApproveTheSubject}
+      />
+
+      <Pagination
+        count={pageCount}
+        variant="outlined"
+        shape="rounded"
+        page={currentPage}
+        onChange={handlePagination}
       />
 
       <ModalCustomization

@@ -1,0 +1,35 @@
+.container {
+  background-color: #d9f6e4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 16px;
+  width: 65%;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    text-align: center;
+    color: #0d5c52;
+
+    .title {
+      font-size: 1.8rem;
+    }
+
+    .description {
+      font-size: 1rem;
+    }
+  }
+
+  .image {
+    width: 35%;
+
+    img {
+      width: 100%;
+    }
+  }
+}

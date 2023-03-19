@@ -42,10 +42,7 @@ interface Props {
 }
 
 export const UserForm = (props: Props) => {
-  const {
-    // userInfo,
-    onAddUser = () => {},
-  } = props;
+  const { onAddUser = () => {} } = props;
   const [activated, setActivated] = useState(true);
 
   const {
@@ -92,47 +89,53 @@ export const UserForm = (props: Props) => {
       </Paper>
       <Paper elevation={3} className={cx("formWrapper")}>
         <form onSubmit={handleSubmit(handleChangeData)} className={cx("form")}>
-          <FormControl className={cx("formItem")}>
-            <Controller
-              name="email"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Email"
-                  variant="outlined"
-                  error={!!errors.email}
-                  helperText={errors.email ? errors.email?.message : ""}
-                  fullWidth
-                  margin="dense"
-                />
-              )}
-            />
-          </FormControl>
-          <FormControl className={cx("formItem")}>
-            <Controller
-              control={control}
-              name="roles"
-              render={({ field: { onChange } }) => (
-                <Autocomplete
-                  placeholder="Roles"
-                  onChange={(event, item) => {
-                    onChange(item);
-                  }}
-                  options={["ADMIN", "USER"]}
-                  sx={{ width: 300 }}
-                  disablePortal
-                  renderInput={params => (
-                    <TextField {...params} label="Roles" />
-                  )}
-                />
-              )}
-            />
-          </FormControl>
+          <Box className={cx("box")}>
+            <FormControl className={cx("formItem")}>
+              <Controller
+                name="email"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Email"
+                    variant="outlined"
+                    error={!!errors.email}
+                    helperText={errors.email ? errors.email?.message : ""}
+                    fullWidth
+                    margin="dense"
+                  />
+                )}
+              />
+            </FormControl>
+            <FormControl className={cx("formItem")}>
+              <Controller
+                control={control}
+                name="roles"
+                render={({ field: { onChange } }) => (
+                  <Autocomplete
+                    placeholder="Roles"
+                    onChange={(event, item) => {
+                      onChange(item);
+                    }}
+                    options={["ADMIN", "USER"]}
+                    sx={{ width: 300 }}
+                    disablePortal
+                    renderInput={params => (
+                      <TextField {...params} label="Roles" />
+                    )}
+                  />
+                )}
+              />
+            </FormControl>
+          </Box>
 
           <FormControl className={cx("formItem")}>
-            <Button variant="contained" type="submit">
+            <Button
+              className={cx("btnSubmit")}
+              variant="contained"
+              type="submit"
+            >
               Submit
             </Button>
           </FormControl>

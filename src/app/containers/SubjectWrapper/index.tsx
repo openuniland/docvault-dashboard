@@ -16,6 +16,7 @@ import { useGetAllSubjects } from "queries/subject";
 import { useAddTheSubject, useApproveTheSubject } from "mutations/subject";
 import { ModalCustomization } from "app/components/ModalCustomization";
 import { DEFAULT_PAGINATION } from "utils/constants";
+import { enqueueSnackbar } from "notistack";
 
 const cx = classNames.bind(styles);
 
@@ -73,6 +74,9 @@ export const SubjectWrapper = () => {
         handleClosePropup();
         refetchSubjects();
         setResponseError("");
+        enqueueSnackbar("New subject successfully created!", {
+          variant: "success",
+        });
       } catch (error: any) {
         setResponseError(error?.message);
         console.log(error);

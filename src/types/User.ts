@@ -8,3 +8,9 @@ export interface User {
   created_at: string;
   updated_at: string;
 }
+
+export interface NewUserPayload {
+  email: string;
+  role?: string;
+  is_deleted?: boolean;
+}

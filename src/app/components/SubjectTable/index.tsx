@@ -397,7 +397,7 @@ export const SubjectTable = (props: Props) => {
                 orderBy={orderBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={rows.length}
+                rowCount={subjects.length}
               />
               <TableBody>
                 {subjects.map(row => {

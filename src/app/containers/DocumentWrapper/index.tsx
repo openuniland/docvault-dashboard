@@ -14,6 +14,7 @@ import { DocumentTable } from "app/components/DocumentTable";
 import { useGetAllDocument } from "queries/document";
 import { useApproveTheDocument } from "mutations/document";
 import { DEFAULT_PAGINATION } from "utils/constants";
+import { enqueueSnackbar } from "notistack";
 
 const cx = classNames.bind(styles);
 
@@ -37,6 +38,10 @@ export const DocumentWrapper = () => {
           await mutateAsync({
             id,
             is_approved,
+          });
+
+          enqueueSnackbar("Approval processing successful!", {
+            variant: "success",
           });
 
           refetchDocuments();

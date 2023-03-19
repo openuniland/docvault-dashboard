@@ -241,7 +241,6 @@ export const UsersTable = (props: Props) => {
     },
     [selected, users],
   );
-  console.log("selected", selected);
 
   const handleSort = useCallback(
     (newOrder: Order, newOrderBy: keyof User, newDocuments: User[]) => {
@@ -401,7 +400,7 @@ export const UsersTable = (props: Props) => {
                 orderBy={orderBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={rows.length}
+                rowCount={users.length}
               />
               <TableBody>
                 {users.map(row => {

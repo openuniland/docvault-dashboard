@@ -6,7 +6,9 @@ const withAppHeader = (WrappedComponent: React.ComponentType) => {
     return (
       <>
         <AppHeader />
-        <WrappedComponent {...props} />
+        <div style={{ height: "calc(100vh - 100px)", overflowY: "scroll" }}>
+          <WrappedComponent {...props} />
+        </div>
       </>
     );
   };

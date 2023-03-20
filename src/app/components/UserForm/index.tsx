@@ -49,8 +49,12 @@ export const UserForm = (props: Props) => {
     handleSubmit,
     control,
     formState: { errors },
+    reset: resetUserForm,
   } = useForm<IFormProps>({
     resolver: yupResolver(AddUserSchema),
+    defaultValues: {
+      roles: undefined,
+    },
   });
 
   const handleChangeUserStatus = useCallback(
@@ -67,6 +71,8 @@ export const UserForm = (props: Props) => {
         roles: data.roles,
         is_deleted: !activated,
       });
+
+      resetUserForm();
     },
     [activated],
   );
@@ -112,12 +118,13 @@ export const UserForm = (props: Props) => {
               <Controller
                 control={control}
                 name="roles"
-                render={({ field: { onChange } }) => (
+                render={({ field: { onChange, value } }) => (
                   <Autocomplete
                     placeholder="Roles"
                     onChange={(event, item) => {
                       onChange(item);
                     }}
+                    value={value || null}
                     options={["ADMIN", "USER"]}
                     sx={{ width: 300 }}
                     disablePortal

@@ -17,27 +17,26 @@ const settings = {
 
 export const SlickTrackSlider = () => {
   return (
-    <div className={cx("container")}>
-      <Slider {...settings}>
-        <div>
-          <h3>1</h3>
-        </div>
-        <div>
-          <h3>2</h3>
-        </div>
-        <div>
-          <h3>3</h3>
-        </div>
-        <div>
-          <h3>4</h3>
-        </div>
-        <div>
-          <h3>5</h3>
-        </div>
-        <div>
-          <h3>6</h3>
-        </div>
-      </Slider>
-    </div>
+    <Slider
+      {...settings}
+      className={cx("container")}
+      arrows={false}
+      autoplay
+      infinite
+      dots={false}
+    >
+      <div className={cx("sliderItem")}>
+        <img
+          src="https://ewr1.vultrobjects.com/lmsbzzbx/blog/en0jcj4482737.png"
+          alt=""
+        />
+      </div>
+      <div className={cx("sliderItem")}>
+        <img
+          src="https://i.pinimg.com/originals/2a/8d/e7/2a8de758a5297cec8e119b04c5b3dcd8.jpg"
+          alt=""
+        />
+      </div>
+    </Slider>
   );
 };

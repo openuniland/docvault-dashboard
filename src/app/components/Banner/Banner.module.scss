@@ -6,31 +6,36 @@
   border-radius: 16px;
   height: 100%;
   width: 100%;
+}
 
-  .content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+.image {
+  max-height: 320px;
+  img {
     width: 100%;
-    text-align: center;
-    color: #0d5c52;
+    height: 100%;
+    object-fit: contain;
+  }
+}
 
-    .title {
-      font-size: 1.8rem;
-    }
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 18px;
+  text-align: center;
+  color: #0d5c52;
 
-    .description {
-      font-size: 1rem;
-    }
+  .title {
+    font-size: 1.8rem;
   }
 
-  .image {
-    width: 35%;
-
-    img {
-      width: 100%;
-    }
+  .description {
+    font-size: 1rem;
   }
+}
+
+.row {
+  width: 100%;
+  height: 100%;
 }

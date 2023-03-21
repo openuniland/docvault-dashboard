@@ -3,6 +3,10 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+import gocover1 from "assets/images/gocover1.jpg";
+import gocover2 from "assets/images/gocover2.jpg";
+import gocover3 from "assets/images/gocover3.png";
+import gocover4 from "assets/images/gocover4.png";
 import styles from "./SlickTrackSlider.module.scss";
 
 const cx = classNames.bind(styles);
@@ -17,26 +21,29 @@ const settings = {
 
 export const SlickTrackSlider = () => {
   return (
-    <Slider
-      {...settings}
-      className={cx("container")}
-      arrows={false}
-      autoplay
-      infinite
-      dots={false}
-    >
-      <div className={cx("sliderItem")}>
-        <img
-          src="https://ewr1.vultrobjects.com/lmsbzzbx/blog/en0jcj4482737.png"
-          alt=""
-        />
-      </div>
-      <div className={cx("sliderItem")}>
-        <img
-          src="https://i.pinimg.com/originals/2a/8d/e7/2a8de758a5297cec8e119b04c5b3dcd8.jpg"
-          alt=""
-        />
-      </div>
-    </Slider>
+    <div className={cx("container")}>
+      <Slider
+        {...settings}
+        className={cx("slider")}
+        arrows={false}
+        infinite
+        autoplay
+        dots={true}
+        dotsClass={cx("dots")}
+      >
+        <div className={cx("sliderItem")}>
+          <img src={gocover1} alt="go cover" />
+        </div>
+        <div className={cx("sliderItem")}>
+          <img src={gocover2} alt="go cover" />
+        </div>
+        <div className={cx("sliderItem")}>
+          <img src={gocover3} alt="go cover" />
+        </div>
+        <div className={cx("sliderItem")}>
+          <img src={gocover4} alt="go cover" />
+        </div>
+      </Slider>
+    </div>
   );
 };

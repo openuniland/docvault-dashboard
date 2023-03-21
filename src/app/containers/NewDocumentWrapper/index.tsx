@@ -7,6 +7,7 @@ import styles from "./NewDocumentWrapper.module.scss";
 import { DocumentForm } from "app/components/DocumentForm";
 import { CreateDocumentModelForm } from "types/DocumentModel";
 import { useCreateTheDocument } from "mutations/document";
+import { enqueueSnackbar } from "notistack";
 
 const cx = classNames.bind(styles);
 
@@ -24,6 +25,10 @@ export const NewDocumentWrapper = () => {
           school_year: data.school_year,
           semester: Number(data.semester),
           subject: data.subject._id as any,
+        });
+
+        enqueueSnackbar("New document successfully created!", {
+          variant: "success",
         });
       })();
     },

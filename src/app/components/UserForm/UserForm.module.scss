@@ -2,6 +2,8 @@
   padding: 20px;
   width: 100%;
   display: flex;
+  max-width: 1000px;
+  margin: auto;
 }
 
 .paper {
@@ -59,8 +61,21 @@
 .form {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
 
-  & .formItem {
-    margin-bottom: 22px;
-  }
+.box {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.formItem {
+  margin-bottom: 22px;
+}
+
+.btnSubmit {
+  width: 180px;
+  margin: auto;
 }

@@ -5,13 +5,31 @@ import classNames from "classnames/bind";
 import styles from "./AddUserWrapper.module.scss";
 import { UserForm } from "app/components/UserForm";
 import { useCallback } from "react";
+import { useCreateNewUser } from "mutations/user";
+import { enqueueSnackbar } from "notistack";
 
 const cx = classNames.bind(styles);
 
 export const AddUserWrapper = () => {
+  const { mutateAsync } = useCreateNewUser();
+
   const handleCreateNewUser = useCallback((user: any) => {
-    console.log(user);
+    (async () => {
+      try {
+        await mutateAsync(user);
+
+        enqueueSnackbar("Create new user successfully!", {
+          variant: "success",
+        });
+      } catch (error) {
+        console.log(error);
+        enqueueSnackbar("Something wrong!", {
+          variant: "error",
+        });
+      }
+    })();
   }, []);
+
   return (
     <div>
       <Box className={cx("boxHeader")}>

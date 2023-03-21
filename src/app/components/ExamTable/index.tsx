@@ -27,6 +27,7 @@ import {
   LinearProgress,
   Menu,
   MenuItem,
+  Switch,
   Tab,
   Tabs,
   TextField,
@@ -35,8 +36,8 @@ import {
   Typography,
 } from "@mui/material";
 
-import { User } from "types/User";
-import styles from "./UserTable.module.scss";
+import styles from "./ExamTable.module.scss";
+import { Exam } from "types/Exam";
 
 const cx = classNames.bind(styles);
 
@@ -44,7 +45,7 @@ type Order = "asc" | "desc";
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof User;
+  id: keyof Exam;
   label: string;
   numeric: boolean;
   sortable?: boolean;
@@ -52,37 +53,32 @@ interface HeadCell {
 
 const headCells: readonly HeadCell[] = [
   {
-    id: "fullname",
+    id: "author",
+    numeric: false,
+    disablePadding: false,
+    sortable: false,
+    label: "Author",
+  },
+  {
+    id: "title",
     numeric: false,
     disablePadding: false,
     sortable: true,
-    label: "Full Name",
+    label: "Title",
   },
   {
-    id: "email",
+    id: "is_approved",
+    numeric: false,
+    disablePadding: false,
+    sortable: false,
+    label: "Is Approved",
+  },
+  {
+    id: "created_at",
     numeric: false,
     disablePadding: false,
     sortable: true,
-    label: "Email",
-  },
-  {
-    id: "roles",
-    numeric: false,
-    disablePadding: false,
-    label: "Role",
-  },
-  {
-    id: "is_blocked",
-    numeric: false,
-    disablePadding: false,
-    label: "Is Blocked",
-  },
-  {
-    id: "updated_at",
-    numeric: false,
-    disablePadding: false,
-    sortable: true,
-    label: "Updated At",
+    label: "Created At",
   },
   {
     id: "_id",
@@ -96,7 +92,7 @@ interface TableHeadProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof User,
+    property: keyof Exam,
   ) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
@@ -115,7 +111,7 @@ const EnhancedTableHead = (props: TableHeadProps) => {
   } = props;
 
   const createSortHandler = useCallback(
-    (property: keyof User) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof Exam) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     },
     [],
@@ -189,7 +185,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           id="tableTitle"
           component="div"
         >
-          Danh sách người dùng
+          Danh sách đề thi
         </Typography>
       )}
       {numSelected > 0 ? (
@@ -210,18 +206,19 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 }
 
 interface Props {
-  rows?: User[];
+  rows?: Exam[];
   isLoading?: boolean;
+  onApprove?: (id: string, is_approved: boolean) => void;
 }
 
-export const UsersTable = (props: Props) => {
-  const { rows = [], isLoading = false } = props;
+export const ExamTable = (props: Props) => {
+  const { rows = [], isLoading = false, onApprove = () => {} } = props;
 
   const navigate = useNavigate();
 
-  const [users, setUsers] = useState<User[]>(rows);
-  const [order, setOrder] = useState<Order>("asc");
-  const [orderBy, setOrderBy] = useState<keyof User>("fullname");
+  const [exams, setExams] = useState<Exam[]>(rows);
+  const [order, setOrder] = useState<Order>("desc");
+  const [orderBy, setOrderBy] = useState<keyof Exam>("created_at");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [valueOfTab, setValueOfTab] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -230,34 +227,31 @@ export const UsersTable = (props: Props) => {
 
   const handleSelectAllClick = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSelected([]);
       if (event.target.checked) {
-        const newSelected = users.map(n => n._id);
+        const newSelected = exams.map(n => n._id);
         setSelected(newSelected);
         return;
       }
-
       setSelected([]);
     },
-    [selected, users],
+    [selected, exams],
   );
 
   const handleSort = useCallback(
-    (newOrder: Order, newOrderBy: keyof User, newDocuments: User[]) => {
+    (newOrder: Order, newOrderBy: keyof Exam, newDocuments: Exam[]) => {
       let newArray = [...newDocuments];
 
       newArray.sort((itemA, itemB) => {
         const compare = (a: string, b: string) => a.localeCompare(b);
 
         switch (newOrderBy) {
-          case "fullname":
-          case "email":
+          case "title":
             const valA = String(itemA[newOrderBy]);
             const valB = String(itemB[newOrderBy]);
             return newOrder === "asc"
               ? compare(valA, valB)
               : compare(valB, valA);
-          case "updated_at":
+          case "created_at":
             return newOrder === "asc"
               ? moment(itemA.created_at).diff(moment(itemB.created_at))
               : moment(itemB.created_at).diff(moment(itemA.created_at));
@@ -268,22 +262,22 @@ export const UsersTable = (props: Props) => {
 
       return newArray;
     },
-    [order, orderBy, users],
+    [order, orderBy, exams],
   );
 
   const handleRequestSort = useCallback(
-    (event: React.MouseEvent<unknown>, property: keyof User) => {
+    (event: React.MouseEvent<unknown>, property: keyof Exam) => {
       const isAsc = orderBy === property && order === "asc";
       const newOrder = isAsc ? "desc" : "asc";
       const newOrderBy = property;
       setOrder(newOrder);
       setOrderBy(newOrderBy);
 
-      const data = handleSort(newOrder, newOrderBy, users);
+      const data = handleSort(newOrder, newOrderBy, exams);
 
-      setUsers(data);
+      setExams(data);
     },
-    [users, order, orderBy],
+    [exams, order, orderBy],
   );
 
   const handleClick = useCallback(
@@ -332,9 +326,16 @@ export const UsersTable = (props: Props) => {
     navigate(`/users/edit/${editId}`);
   }, [navigate, editId]);
 
+  const handleToggleApprove = useCallback(
+    (id: string, is_approved: boolean) => () => {
+      onApprove(id, !is_approved);
+    },
+    [],
+  );
+
   useEffect(() => {
     const data = handleSort(order, orderBy, rows);
-    setUsers(data);
+    setExams(data);
   }, [rows]);
 
   const handleChangeTab = useCallback(
@@ -344,16 +345,16 @@ export const UsersTable = (props: Props) => {
 
       switch (tabIndex) {
         case 1:
-          newArray = newArray.filter(item => item.roles === "ADMIN");
+          newArray = newArray.filter(item => item.is_approved === true);
           break;
         case 2:
-          newArray = newArray.filter(item => item.roles === "USER");
+          newArray = newArray.filter(item => item.is_approved === false);
           break;
         default:
           break;
       }
 
-      setUsers(newArray);
+      setExams(newArray);
     },
     [valueOfTab, rows],
   );
@@ -370,8 +371,8 @@ export const UsersTable = (props: Props) => {
             classes={{ indicator: cx("indicator") }}
           >
             <Tab label="All" classes={{ selected: cx("selected") }} />
-            <Tab label="ADMIN" classes={{ selected: cx("selected") }} />
-            <Tab label="USER" classes={{ selected: cx("selected") }} />
+            <Tab label="APPROVED" classes={{ selected: cx("selected") }} />
+            <Tab label="NOT APPROVED" classes={{ selected: cx("selected") }} />
           </Tabs>
         </Box>
         <Box
@@ -400,10 +401,10 @@ export const UsersTable = (props: Props) => {
                 orderBy={orderBy}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={users.length}
+                rowCount={exams.length}
               />
               <TableBody>
-                {users.map(row => {
+                {exams.map(row => {
                   const isItemSelected = isSelected(row._id);
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>
@@ -417,10 +418,19 @@ export const UsersTable = (props: Props) => {
                           className={cx("checkbox")}
                         />
                       </TableCell>
-                      <TableCell align="left">{row.fullname}</TableCell>
-                      <TableCell align="left">{row.email}</TableCell>
-                      <TableCell align="left">{row.roles}</TableCell>
-                      <TableCell align="left">{`${row.is_blocked}`}</TableCell>
+                      <TableCell component="th" scope="row" padding="none">
+                        {row.author?.fullname}
+                      </TableCell>
+                      <TableCell align="left">{row.title}</TableCell>
+                      <TableCell align="left">
+                        <Switch
+                          checked={row.is_approved}
+                          onChange={handleToggleApprove(
+                            row._id,
+                            row.is_approved,
+                          )}
+                        />
+                      </TableCell>
                       <TableCell align="left">
                         {`${moment(row.created_at).format(
                           "hh:mm - DD/MM/YYYY",

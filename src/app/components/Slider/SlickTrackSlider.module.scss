@@ -1,0 +1,56 @@
+.container {
+  margin-left: 20px;
+  background-color: #d9f6e4;
+  overflow: hidden;
+  border-radius: 16px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .slider {
+    width: 100%;
+    max-height: 320px;
+  }
+
+  .sliderItem {
+    width: 400px;
+    height: 320px;
+    outline: none;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.dots {
+  display: flex !important;
+  position: absolute;
+  top: 0;
+  left: 10px;
+  list-style: none;
+
+  li {
+    button {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: rgba(0, 171, 85, 0.5);
+      border: none;
+      outline: none;
+      margin: 0 5px;
+      cursor: pointer;
+      color: transparent;
+    }
+  }
+}
+
+.dots :global(li.slick-active) {
+  button {
+    background-color: rgb(0, 171, 85);
+  }
+}

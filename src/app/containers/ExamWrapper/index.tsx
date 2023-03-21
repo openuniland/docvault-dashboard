@@ -7,31 +7,31 @@ import {
   Typography,
 } from "@mui/material";
 import classNames from "classnames/bind";
-import { useCallback, useMemo, useState } from "react";
-
-import styles from "./DocumentWrapper.module.scss";
-import { DocumentTable } from "app/components/DocumentTable";
-import { useGetAllDocument } from "queries/document";
-import { useApproveTheDocument } from "mutations/document";
-import { DEFAULT_PAGINATION } from "utils/constants";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { enqueueSnackbar } from "notistack";
+
+import styles from "./ExamWrapper.module.scss";
+import { DEFAULT_PAGINATION } from "utils/constants";
+import { ExamTable } from "app/components/ExamTable";
+import { useGetAllExams } from "queries/exam";
+import { useApproveTheExam } from "mutations/exam";
 
 const cx = classNames.bind(styles);
 
-export const DocumentWrapper = () => {
+export const ExamWrapper = () => {
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
 
   const {
-    data: documents,
+    data: exams,
     isLoading,
-    refetch: refetchDocuments,
-  } = useGetAllDocument({ currentPage: currentPage - 1 });
+    refetch: refetchExams,
+  } = useGetAllExams({ currentPage: currentPage - 1 });
 
-  const { mutateAsync } = useApproveTheDocument();
+  const { mutateAsync, isError } = useApproveTheExam();
 
-  const handleApproveTheSubject = useCallback(
+  const handleApproveTheExam = useCallback(
     (id: string, is_approved: boolean) => {
       (async () => {
         try {
@@ -44,7 +44,7 @@ export const DocumentWrapper = () => {
             variant: "success",
           });
 
-          refetchDocuments();
+          refetchExams();
         } catch (error: any) {
           console.log(error);
         }
@@ -54,8 +54,8 @@ export const DocumentWrapper = () => {
   );
 
   const handleRefreshDocument = useCallback(() => {
-    refetchDocuments();
-  }, [refetchDocuments]);
+    refetchExams();
+  }, [refetchExams]);
 
   const handleRedirectToCreateDocument = useCallback(() => {
     navigate(`/documents/new`);
@@ -69,11 +69,19 @@ export const DocumentWrapper = () => {
   );
 
   const pageCount = useMemo(() => {
-    const total = documents?.meta?.total || 0;
+    const total = exams?.meta?.total || 0;
     const pageSize = DEFAULT_PAGINATION.pageSize;
 
     return Math.ceil(total / pageSize);
-  }, [documents?.meta?.total]);
+  }, [exams?.meta?.total]);
+
+  useEffect(() => {
+    if (isError) {
+      enqueueSnackbar(`Approval processing error!`, {
+        variant: "error",
+      });
+    }
+  }, [isError]);
 
   return (
     <div className={cx("container")}>
@@ -82,8 +90,8 @@ export const DocumentWrapper = () => {
           <Link className={cx("link")} to="/">
             Dashboard
           </Link>
-          <Link className={cx("link")} to="/documents">
-            Document
+          <Link className={cx("link")} to="/exams">
+            Exam
           </Link>
           <Typography className={cx("current")}>List</Typography>
         </Breadcrumbs>
@@ -101,15 +109,15 @@ export const DocumentWrapper = () => {
             variant="contained"
             onClick={handleRedirectToCreateDocument}
           >
-            Thêm tài liệu
+            Thêm mới
           </Button>
         </Box>
       </Box>
 
-      <DocumentTable
-        rows={documents?.data}
+      <ExamTable
+        rows={exams?.data}
         isLoading={isLoading}
-        onApprove={handleApproveTheSubject}
+        onApprove={handleApproveTheExam}
       />
 
       <Pagination

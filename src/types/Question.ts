@@ -11,3 +11,14 @@ export interface Question {
   is_essay: boolean;
   is_approved: boolean;
 }
+
+export interface QuestionModelForm {
+  exam_id: string;
+  content: string;
+  image?: string;
+  correct_answer?: Answer;
+  answers: Answer[];
+  accuracy: string;
+  is_essay: boolean;
+  is_approved: boolean;
+}

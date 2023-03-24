@@ -1,11 +1,11 @@
 export interface Answer {
-  _id: string;
+  id: string;
   content: string;
   status: boolean;
 }
 
 export interface CorrectAnswer {
-  _id: string;
+  id: string;
   content: string;
   status: boolean;
 }

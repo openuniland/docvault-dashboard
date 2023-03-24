@@ -1,6 +1,6 @@
 import { useQuery } from "react-query";
 
-import { getAllExams } from "services/exam";
+import { getAllExams, getDraftExam } from "services/exam";
 import { URLparams } from "types";
 
 import { STALE_TIME } from "utils/constants";
@@ -13,3 +13,8 @@ export const useGetAllExams = (urlParams: URLparams) =>
       staleTime: STALE_TIME.ONE_HOUR,
     },
   );
+
+export const useGetDraftExam = () =>
+  useQuery(["get-draft-exam"], () => getDraftExam(), {
+    staleTime: STALE_TIME.ONE_HOUR,
+  });

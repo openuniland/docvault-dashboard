@@ -43,7 +43,7 @@ export const NewDocumentWrapper = () => {
             Dashboard
           </Link>
           <Link className={cx("link")} to="/documents">
-            Document
+            Documents
           </Link>
           <Typography className={cx("current")}>New Document</Typography>
         </Breadcrumbs>

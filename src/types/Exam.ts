@@ -10,6 +10,7 @@ export interface Exam {
   title: string;
   semester: number;
   school_year: string;
+  is_draft: boolean;
   is_deleted: boolean;
   is_approved: boolean;
   created_at: string;
@@ -18,4 +19,15 @@ export interface Exam {
 export interface ApproveTheExamPayload {
   id: string;
   is_approved: boolean;
+}
+
+export interface CreateExamModelForm {
+  title: string;
+  description: string;
+  subject: Subject;
+  semester: string;
+  school_year: string;
+  is_approved: boolean;
+  is_draft: boolean;
+  questions: Question[];
 }

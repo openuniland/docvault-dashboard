@@ -30,3 +30,15 @@ export const approveTheExam = async (
 
   return response?.data?.data;
 };
+
+export const createNewExam = async (): Promise<Exam> => {
+  const response: AxiosResponse = await http.post(`/exams`);
+
+  return response?.data?.data;
+};
+
+export const getDraftExam = async (): Promise<Exam> => {
+  const response: AxiosResponse = await http.get(`/exams/draft-exam`);
+
+  return response?.data?.data;
+};

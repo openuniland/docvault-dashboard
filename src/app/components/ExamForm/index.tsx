@@ -21,9 +21,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import styles from "./ExamForm.module.scss";
 import { useGetAllSubjectsApproved } from "queries/subject";
-import { CreateExamModelForm } from "types/Exam";
-import { QuestionModelForm } from "types/Question";
+import { CreateExamModelForm, Exam } from "types/Exam";
+import { NewQuestionPayload } from "types/Question";
 import { Answer } from "types/Answer";
+import { useCreateNewQuestion } from "mutations/question";
+import { enqueueSnackbar } from "notistack";
 
 const cx = classNames.bind(styles);
 
@@ -36,20 +38,24 @@ const newExamSchema = Yup.object().shape({
 
 const questionSchema = Yup.object().shape({
   content: Yup.string().trim().required("Content is required field"),
-  image: Yup.string().trim().required("Image is required field"),
   accuracy: Yup.string().trim().required("Accuracy is required field"),
 });
 
-interface Props {}
+interface Props {
+  exam?: Exam;
+}
 
 export const ExamForm = (props: Props) => {
-  // const [question, setQuestion] = useState<QuestionModelForm[]>([]);
+  const { exam } = props;
+  // const [question, setQuestion] = useState<NewQuestionPayload[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [currentAnswerContent, setCurrentAnswerContent] = useState("");
 
   const { data: subjects = [], isLoading: isLoadingSubject } =
     useGetAllSubjectsApproved();
+
+  const { mutateAsync } = useCreateNewQuestion();
 
   const {
     handleSubmit,
@@ -71,8 +77,13 @@ export const ExamForm = (props: Props) => {
     control: controlQuestion,
     formState: { errors: errorsQuestion },
     setValue: setValueQuestion,
-  } = useForm<QuestionModelForm>({
+    reset: resetQuestion,
+    trigger: triggerQuestion,
+  } = useForm<NewQuestionPayload>({
     resolver: yupResolver(questionSchema),
+    defaultValues: {
+      accuracy: undefined,
+    },
   });
 
   const handleChangeData = useCallback(
@@ -82,9 +93,27 @@ export const ExamForm = (props: Props) => {
     [resetExam],
   );
 
-  const handleChangeQuestion = useCallback((data: QuestionModelForm) => {
-    console.log(data, "data");
-  }, []);
+  const handleChangeQuestion = useCallback(
+    async (data: NewQuestionPayload) => {
+      try {
+        console.log(data);
+
+        await mutateAsync({ ...data, exam_id: exam?._id });
+        resetQuestion();
+        setAnswers([]);
+
+        enqueueSnackbar("Question successful created!", {
+          variant: "success",
+        });
+      } catch (error: any) {
+        enqueueSnackbar(`${error?.message}`, {
+          variant: "error",
+        });
+        console.log(error);
+      }
+    },
+    [exam, correctAnswer, triggerQuestion],
+  );
 
   const handleAddAnswer = useCallback(() => {
     const a = {
@@ -109,11 +138,9 @@ export const ExamForm = (props: Props) => {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setCorrectAnswer(event.target.value);
       const ca = answers.find((item: any) => item.id === event.target.value);
-      console.log("ca", ca);
-
       setValueQuestion("correct_answer", ca);
     },
-    [correctAnswer],
+    [correctAnswer, setValueQuestion, answers],
   );
 
   return (
@@ -348,9 +375,11 @@ export const ExamForm = (props: Props) => {
                       <TextField
                         {...params}
                         label="Độ chính xác"
-                        error={!!errors.semester}
+                        error={!!errorsQuestion.accuracy}
                         helperText={
-                          errors.semester ? errors.semester?.message : ""
+                          errorsQuestion.accuracy
+                            ? errorsQuestion.accuracy?.message
+                            : ""
                         }
                       />
                     )}

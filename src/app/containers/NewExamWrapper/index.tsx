@@ -73,7 +73,7 @@ export const NewExamWrapper = () => {
         </Box>
       )}
 
-      <ExamForm />
+      <ExamForm exam={exam} />
     </div>
   );
 };

@@ -118,7 +118,7 @@ const EnhancedTableHead = (props: TableHeadProps) => {
     (property: keyof User) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     },
-    [],
+    [order, orderBy, onRequestSort],
   );
 
   return (
@@ -244,6 +244,8 @@ export const UsersTable = (props: Props) => {
 
   const handleSort = useCallback(
     (newOrder: Order, newOrderBy: keyof User, newDocuments: User[]) => {
+      console.log("newDocuments", newDocuments);
+
       let newArray = [...newDocuments];
 
       newArray.sort((itemA, itemB) => {
@@ -268,7 +270,7 @@ export const UsersTable = (props: Props) => {
 
       return newArray;
     },
-    [order, orderBy, users],
+    [],
   );
 
   const handleRequestSort = useCallback(
@@ -279,11 +281,11 @@ export const UsersTable = (props: Props) => {
       setOrder(newOrder);
       setOrderBy(newOrderBy);
 
-      const data = handleSort(newOrder, newOrderBy, users);
+      const data = handleSort(newOrder, newOrderBy, rows);
 
       setUsers(data);
     },
-    [users, order, orderBy],
+    [rows, order, orderBy],
   );
 
   const handleClick = useCallback(
@@ -335,7 +337,7 @@ export const UsersTable = (props: Props) => {
   useEffect(() => {
     const data = handleSort(order, orderBy, rows);
     setUsers(data);
-  }, [rows]);
+  }, [rows?.length]);
 
   const handleChangeTab = useCallback(
     (event: React.SyntheticEvent, tabIndex: number) => {

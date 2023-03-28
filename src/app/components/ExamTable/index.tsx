@@ -114,7 +114,7 @@ const EnhancedTableHead = (props: TableHeadProps) => {
     (property: keyof Exam) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     },
-    [],
+    [order, orderBy, onRequestSort],
   );
 
   return (

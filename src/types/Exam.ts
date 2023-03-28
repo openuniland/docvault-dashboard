@@ -5,7 +5,7 @@ import { User } from "./User";
 export interface Exam {
   _id: string;
   author: User;
-  question: Question;
+  questions: Question[];
   subject: Subject;
   title: string;
   semester: number;
@@ -29,5 +29,24 @@ export interface CreateExamModelForm {
   school_year: string;
   is_approved: boolean;
   is_draft: boolean;
-  questions: Question[];
+}
+
+export interface RequestUpdateExam {
+  title: string;
+  description: string;
+  subject: string;
+  semester: string;
+  school_year: string;
+  is_approved: boolean;
+  is_draft: boolean;
+}
+
+export interface UpdateExamByAdminPayload {
+  examId: string;
+  requestUpdateExamPayload: RequestUpdateExam;
+}
+
+export interface RequestUpdateExamPayload {
+  examId: string;
+  requestUpdateExamPayload: CreateExamModelForm;
 }

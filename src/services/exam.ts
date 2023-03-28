@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 
 import { DataWithMeta, URLparams } from "types";
-import { ApproveTheExamPayload, Exam } from "types/Exam";
+import { ApproveTheExamPayload, Exam, RequestUpdateExam } from "types/Exam";
 import http from "utils/api/http";
 import { DEFAULT_PAGINATION } from "utils/constants";
 
@@ -33,6 +33,18 @@ export const approveTheExam = async (
 
 export const createNewExam = async (): Promise<Exam> => {
   const response: AxiosResponse = await http.post(`/exams`);
+
+  return response?.data?.data;
+};
+
+export const updateExamByAdmin = async (
+  payload: RequestUpdateExam,
+  examId: string,
+): Promise<Exam> => {
+  const response: AxiosResponse = await http.patch(
+    `/administrator/exams/${examId}`,
+    payload,
+  );
 
   return response?.data?.data;
 };

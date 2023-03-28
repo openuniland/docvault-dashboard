@@ -5,10 +5,10 @@ import classNames from "classnames/bind";
 
 import styles from "./NewExamWrapper.module.scss";
 import { enqueueSnackbar } from "notistack";
-import { useCreateNewExam } from "mutations/exam";
+import { useCreateNewExam, useUpdateExamByAdmin } from "mutations/exam";
 import { useGetDraftExam } from "queries/exam";
 import { ExamForm } from "app/components/ExamForm";
-import { Exam } from "types/Exam";
+import { Exam, RequestUpdateExamPayload } from "types/Exam";
 
 const cx = classNames.bind(styles);
 
@@ -17,6 +17,7 @@ export const NewExamWrapper = () => {
 
   const { data: draftExam, isLoading } = useGetDraftExam();
   const { mutateAsync } = useCreateNewExam();
+  const { mutateAsync: mutateAsyncUpdateExam } = useUpdateExamByAdmin();
 
   const handleGenerateDraftExam = useCallback(async () => {
     const data = await mutateAsync();
@@ -27,11 +28,37 @@ export const NewExamWrapper = () => {
     });
   }, [setExam]);
 
+  const handleSubmitExam = useCallback(
+    async (data: RequestUpdateExamPayload) => {
+      try {
+        await mutateAsyncUpdateExam({
+          requestUpdateExamPayload: {
+            ...data.requestUpdateExamPayload,
+            subject: data.requestUpdateExamPayload?.subject._id,
+            is_draft: false,
+          },
+          examId: data.examId,
+        });
+
+        enqueueSnackbar(`New exam successfully updated!`, {
+          variant: "success",
+        });
+
+        setExam(undefined);
+      } catch (error) {
+        enqueueSnackbar(`Update exam failed!`, {
+          variant: "error",
+        });
+      }
+    },
+    [],
+  );
+
   useLayoutEffect(() => {
     if (draftExam) {
       setExam(draftExam);
     }
-  }, [draftExam]);
+  }, [draftExam?._id]);
 
   return (
     <div>
@@ -73,7 +100,7 @@ export const NewExamWrapper = () => {
         </Box>
       )}
 
-      <ExamForm exam={exam} />
+      <ExamForm exam={exam} onSubmit={handleSubmitExam} />
     </div>
   );
 };

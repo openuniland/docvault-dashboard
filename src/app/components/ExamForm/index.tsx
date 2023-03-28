@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
 import {
@@ -21,11 +21,16 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import styles from "./ExamForm.module.scss";
 import { useGetAllSubjectsApproved } from "queries/subject";
-import { CreateExamModelForm, Exam } from "types/Exam";
+import {
+  CreateExamModelForm,
+  Exam,
+  RequestUpdateExamPayload,
+} from "types/Exam";
 import { NewQuestionPayload } from "types/Question";
 import { Answer } from "types/Answer";
 import { useCreateNewQuestion } from "mutations/question";
 import { enqueueSnackbar } from "notistack";
+import RenderQuestion from "../RenderQuestion";
 
 const cx = classNames.bind(styles);
 
@@ -43,14 +48,14 @@ const questionSchema = Yup.object().shape({
 
 interface Props {
   exam?: Exam;
+  onSubmit?: (data: RequestUpdateExamPayload) => void;
 }
 
 export const ExamForm = (props: Props) => {
-  const { exam } = props;
-  // const [question, setQuestion] = useState<NewQuestionPayload[]>([]);
+  const { exam, onSubmit = () => {} } = props;
+  const [questions, setQuestions] = useState<NewQuestionPayload[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [correctAnswer, setCorrectAnswer] = useState("");
-  const [currentAnswerContent, setCurrentAnswerContent] = useState("");
 
   const { data: subjects = [], isLoading: isLoadingSubject } =
     useGetAllSubjectsApproved();
@@ -77,30 +82,44 @@ export const ExamForm = (props: Props) => {
     control: controlQuestion,
     formState: { errors: errorsQuestion },
     setValue: setValueQuestion,
+    getValues: getValuesQuestion,
     reset: resetQuestion,
     trigger: triggerQuestion,
   } = useForm<NewQuestionPayload>({
     resolver: yupResolver(questionSchema),
     defaultValues: {
       accuracy: undefined,
+      answers: [],
+      new_answers: "",
     },
   });
 
   const handleChangeData = useCallback(
     (data: CreateExamModelForm) => {
+      onSubmit({
+        requestUpdateExamPayload: data,
+        examId: exam?._id as string,
+      });
       resetExam();
+      setQuestions([]);
     },
-    [resetExam],
+    [resetExam, exam?._id],
   );
 
   const handleChangeQuestion = useCallback(
     async (data: NewQuestionPayload) => {
       try {
-        console.log(data);
-
+        if (!correctAnswer) {
+          enqueueSnackbar("Please choose correct answer!", {
+            variant: "warning",
+          });
+          return;
+        }
         await mutateAsync({ ...data, exam_id: exam?._id });
+        setQuestions(prev => [...prev, data]);
         resetQuestion();
         setAnswers([]);
+        setCorrectAnswer("");
 
         enqueueSnackbar("Question successful created!", {
           variant: "success",
@@ -112,27 +131,20 @@ export const ExamForm = (props: Props) => {
         console.log(error);
       }
     },
-    [exam, correctAnswer, triggerQuestion],
+    [exam?._id, correctAnswer, triggerQuestion, questions],
   );
 
   const handleAddAnswer = useCallback(() => {
     const a = {
-      content: currentAnswerContent,
+      content: getValuesQuestion("new_answers") as string,
       status: false,
       id: uuidv4(),
     };
 
     setAnswers(prev => [...prev, a]);
-    setCurrentAnswerContent("");
     setValueQuestion("answers", [...answers, a]);
-  }, [answers, currentAnswerContent]);
-
-  const handleChangeCurrentAnswerContent = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCurrentAnswerContent(event.target.value);
-    },
-    [currentAnswerContent],
-  );
+    setValueQuestion("new_answers", "");
+  }, [answers]);
 
   const handleChooseCorrectAnswer = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,6 +155,12 @@ export const ExamForm = (props: Props) => {
     [correctAnswer, setValueQuestion, answers],
   );
 
+  useEffect(() => {
+    if (exam?.questions) {
+      setQuestions(exam.questions);
+    }
+  }, [exam?.questions?.length]);
+
   return (
     <div className={cx("container")}>
       <Box className={cx("formWrapper")}>
@@ -151,6 +169,38 @@ export const ExamForm = (props: Props) => {
             onSubmit={handleSubmit(handleChangeData)}
             className={cx("form")}
           >
+            <Box className={cx("subPaper", "formItem")}>
+              <FormControl className={cx("subFormItem")}>
+                <p className={cx("label")}>Publish</p>
+                <Controller
+                  name="is_approved"
+                  control={controlExam}
+                  render={({ field: { onChange, value } }) => (
+                    <Switch
+                      onChange={(event, item) => {
+                        onChange(item);
+                      }}
+                      checked={value}
+                    />
+                  )}
+                />
+              </FormControl>
+              <FormControl className={cx("subFormItem")}>
+                <p className={cx("label")}>Is draft</p>
+                <Controller
+                  name="is_draft"
+                  control={controlExam}
+                  render={({ field: { onChange, value } }) => (
+                    <Switch
+                      onChange={(event, item) => {
+                        onChange(item);
+                      }}
+                      checked={value}
+                    />
+                  )}
+                />
+              </FormControl>
+            </Box>
             <FormControl className={cx("formItem")}>
               <Controller
                 name="title"
@@ -164,7 +214,6 @@ export const ExamForm = (props: Props) => {
                     error={!!errors.title}
                     helperText={errors.title ? errors.title?.message : ""}
                     fullWidth
-                    margin="dense"
                   />
                 )}
               />
@@ -180,7 +229,6 @@ export const ExamForm = (props: Props) => {
                     label="Description"
                     variant="outlined"
                     fullWidth
-                    margin="dense"
                   />
                 )}
               />
@@ -258,57 +306,24 @@ export const ExamForm = (props: Props) => {
                       errors.school_year ? errors.school_year?.message : ""
                     }
                     fullWidth
-                    margin="dense"
                   />
                 )}
               />
             </FormControl>
 
             <FormControl className={cx("formItem")}>
-              <Button variant="contained" type="submit">
+              <Button
+                variant="contained"
+                type="submit"
+                className={cx("submit")}
+              >
                 Submit
               </Button>
             </FormControl>
           </form>
         </Paper>
 
-        {/* render */}
-      </Box>
-      <Box className={cx("subForm")}>
-        <Paper elevation={3} className={cx("subPaper")}>
-          <FormControl className={cx("subFormItem")}>
-            <p className={cx("label")}>Publish</p>
-            <Controller
-              name="is_approved"
-              control={controlExam}
-              render={({ field: { onChange, value } }) => (
-                <Switch
-                  onChange={(event, item) => {
-                    onChange(item);
-                  }}
-                  checked={value}
-                />
-              )}
-            />
-          </FormControl>
-          <FormControl className={cx("subFormItem")}>
-            <p className={cx("label")}>Is draft</p>
-            <Controller
-              name="is_draft"
-              control={controlExam}
-              render={({ field: { onChange, value } }) => (
-                <Switch
-                  onChange={(event, item) => {
-                    onChange(item);
-                  }}
-                  checked={value}
-                />
-              )}
-            />
-          </FormControl>
-        </Paper>
-        {/* question */}
-        <Paper elevation={3} className={cx("subPaper")}>
+        <Paper elevation={3} className={cx("subFormWrapper")}>
           <form
             onSubmit={handleSubmitQuestion(handleChangeQuestion)}
             className={cx("form")}
@@ -330,7 +345,6 @@ export const ExamForm = (props: Props) => {
                         : ""
                     }
                     fullWidth
-                    margin="dense"
                   />
                 )}
               />
@@ -351,7 +365,6 @@ export const ExamForm = (props: Props) => {
                       errorsQuestion.image ? errorsQuestion.image?.message : ""
                     }
                     fullWidth
-                    margin="dense"
                   />
                 )}
               />
@@ -388,14 +401,25 @@ export const ExamForm = (props: Props) => {
               />
             </FormControl>
 
-            <FormControl className={cx("subFormItem")}>
-              <TextField
-                label="Answer A"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                value={currentAnswerContent}
-                onChange={handleChangeCurrentAnswerContent}
+            <FormControl className={cx("subFormItem", "subFormItemAnswer")}>
+              <Controller
+                name="new_answers"
+                control={controlQuestion}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="New answer..."
+                    variant="outlined"
+                    error={!!errorsQuestion.new_answers}
+                    helperText={
+                      errorsQuestion.new_answers
+                        ? errorsQuestion.new_answers?.message
+                        : ""
+                    }
+                    fullWidth
+                  />
+                )}
               />
               <AddCircleIcon
                 onClick={handleAddAnswer}
@@ -428,6 +452,10 @@ export const ExamForm = (props: Props) => {
             </FormControl>
           </form>
         </Paper>
+      </Box>
+
+      <Box className={cx("render")}>
+        <RenderQuestion questions={questions} />
       </Box>
     </div>
   );

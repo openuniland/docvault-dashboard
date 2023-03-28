@@ -18,7 +18,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Autocomplete,
   FormControl,
@@ -38,7 +38,6 @@ import {
 
 import { DocumentModel } from "types/DocumentModel";
 import styles from "./DocumentTable.module.scss";
-import { Link } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 

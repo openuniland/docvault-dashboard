@@ -1,9 +1,11 @@
 import { createTheme } from "@mui/material/styles";
 
+import palette from "styles/palette.scss";
+
 const muiTheme = createTheme({
   palette: {
     primary: {
-      main: "#00ab55",
+      main: palette.primary,
     },
   },
   components: {

@@ -58,7 +58,7 @@ export const ExamWrapper = () => {
   }, [refetchExams]);
 
   const handleRedirectToCreateDocument = useCallback(() => {
-    navigate(`/documents/new`);
+    navigate(`/exams/new`);
   }, [navigate]);
 
   const handlePagination = useCallback(

@@ -53,12 +53,6 @@ interface HeadCell {
 
 const headCells: readonly HeadCell[] = [
   {
-    id: "_id",
-    numeric: false,
-    disablePadding: true,
-    label: "ID",
-  },
-  {
     id: "subject_name",
     numeric: false,
     disablePadding: false,
@@ -108,10 +102,12 @@ const EnhancedTableHead = (props: TableHeadProps) => {
     onRequestSort,
   } = props;
 
-  const createSortHandler =
+  const createSortHandler = useCallback(
     (property: keyof Subject) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
-    };
+    },
+    [order, orderBy, onRequestSort],
+  );
 
   return (
     <TableHead className={cx("tableHead")}>
@@ -413,9 +409,6 @@ export const SubjectTable = (props: Props) => {
                           checked={isItemSelected}
                           className={cx("checkbox")}
                         />
-                      </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
-                        {row._id}
                       </TableCell>
                       <TableCell align="left">{row.subject_name}</TableCell>
                       <TableCell align="left">

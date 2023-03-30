@@ -114,7 +114,7 @@ const EnhancedTableHead = (props: TableHeadProps) => {
     (property: keyof DocumentModel) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     },
-    [],
+    [order, orderBy, onRequestSort],
   );
 
   return (
@@ -423,7 +423,9 @@ export const DocumentTable = (props: Props) => {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row" padding="none">
-                        {row.author?.fullname}
+                        {row.author?.is_show_info
+                          ? row.author?.fullname
+                          : row?.author?.nickname}
                       </TableCell>
                       <TableCell align="left">{row.title}</TableCell>
                       <TableCell align="left">

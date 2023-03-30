@@ -1,0 +1,140 @@
+.container {
+  padding: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.paper {
+  max-width: 360px;
+  padding: 60px 60px 40px 60px;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  & .cardDesc {
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+    margin-top: 16px;
+    color: rgb(99, 115, 129);
+    text-align: center;
+  }
+}
+
+.imgWrapper {
+  width: 156px;
+  height: 156px;
+  border-radius: 50%;
+  border: 2px dashed #000;
+  padding: 12px;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & .statusTitle {
+    font-size: 1rem;
+    margin-right: 12px;
+  }
+}
+
+.formWrapper {
+  flex: 1;
+}
+
+.paperWrapepr {
+  width: 100%;
+  padding: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+
+  & .formItem {
+    margin-bottom: 22px;
+    width: 100%;
+  }
+}
+
+.subForm {
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
+.subPaper {
+  width: 100%;
+  display: flex;
+
+  & .subFormItem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    width: 100%;
+  }
+}
+
+.submit {
+  width: 200px;
+  margin: auto;
+}
+
+.label {
+  font-size: 1rem;
+}
+
+.btnSubmitSubForm {
+  margin: auto;
+  margin-top: 20px;
+}
+
+.addAnswerIcon {
+  margin-left: 5px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.subFormWrapper {
+  padding: 20px;
+  width: 100%;
+  margin-top: 20px;
+
+  .form {
+    width: 100%;
+
+    .subFormItem {
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    .subFormItemAnswer {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

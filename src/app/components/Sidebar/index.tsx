@@ -22,31 +22,37 @@ const menuList = [
     path: "/",
     name: "Trang chủ",
     icon: <HomeIcon />,
+    role: ["ADMIN", "APPROVER"],
   },
   {
     path: "/users",
     name: "Người dùng",
     icon: <PeopleIcon />,
+    role: ["ADMIN"],
   },
   {
     path: "/subjects",
     name: "Môn học",
     icon: <MenuBookIcon />,
+    role: ["ADMIN", "APPROVER"],
   },
   {
     path: "/exams",
     name: "Kiểm tra",
     icon: <TimerIcon />,
+    role: ["ADMIN", "APPROVER"],
   },
   {
     path: "/documents",
     name: "Tài liệu",
     icon: <AssignmentIcon />,
+    role: ["ADMIN", "APPROVER"],
   },
   {
     path: "/favorites",
     name: "Yêu thích",
     icon: <FavoriteIcon />,
+    role: [""],
   },
 ];
 
@@ -79,18 +85,21 @@ export const Sidebar = () => {
       </div>
 
       <div className={cx("menuList")}>
-        {menuList.map(menu => (
-          <Link
-            className={cx("menu", {
-              active: location.pathname === menu.path,
-            })}
-            to={menu.path}
-            key={menu.name}
-          >
-            <span>{menu.icon}</span>
-            <strong>{menu.name}</strong>
-          </Link>
-        ))}
+        {menuList.map(menu => {
+          if (!menu.role.includes(tokens?.userInfo?.role)) return null;
+          return (
+            <Link
+              className={cx("menu", {
+                active: location.pathname === menu.path,
+              })}
+              to={menu.path}
+              key={menu.name}
+            >
+              <span>{menu.icon}</span>
+              <strong>{menu.name}</strong>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

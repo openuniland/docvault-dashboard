@@ -4,6 +4,7 @@ export interface User {
   fullname: string;
   avatar: string;
   is_blocked: boolean;
+  is_deleted: boolean;
   roles: string;
   is_show_info: boolean;
   nickname: string;
@@ -14,5 +15,14 @@ export interface User {
 export interface NewUserPayload {
   email: string;
   role?: string;
-  is_deleted?: boolean;
+  is_blocked?: boolean;
+}
+
+export interface GetUserInfoPayload {
+  id: string;
+}
+
+export interface UpdateUserPayload {
+  id: string;
+  userInfo: NewUserPayload;
 }

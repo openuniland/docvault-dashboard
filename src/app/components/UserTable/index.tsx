@@ -212,10 +212,11 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 interface Props {
   rows?: User[];
   isLoading?: boolean;
+  isRefetching?: boolean;
 }
 
 export const UsersTable = (props: Props) => {
-  const { rows = [], isLoading = false } = props;
+  const { rows = [], isLoading = false, isRefetching } = props;
 
   const navigate = useNavigate();
 
@@ -244,8 +245,6 @@ export const UsersTable = (props: Props) => {
 
   const handleSort = useCallback(
     (newOrder: Order, newOrderBy: keyof User, newDocuments: User[]) => {
-      console.log("newDocuments", newDocuments);
-
       let newArray = [...newDocuments];
 
       newArray.sort((itemA, itemB) => {
@@ -337,7 +336,7 @@ export const UsersTable = (props: Props) => {
   useEffect(() => {
     const data = handleSort(order, orderBy, rows);
     setUsers(data);
-  }, [rows?.length]);
+  }, [rows?.length, isRefetching]);
 
   const handleChangeTab = useCallback(
     (event: React.SyntheticEvent, tabIndex: number) => {

@@ -23,6 +23,7 @@ export const UserWrapper = () => {
   const {
     data: users,
     isLoading,
+    isRefetching,
     refetch: refetchUsers,
   } = useGetAllUsers({ currentPage: currentPage - 1 });
 
@@ -79,7 +80,11 @@ export const UserWrapper = () => {
           </Button>
         </Box>
       </Box>
-      <UsersTable rows={users?.data} isLoading={isLoading} />
+      <UsersTable
+        rows={users?.data}
+        isLoading={isLoading}
+        isRefetching={isRefetching}
+      />
 
       <Pagination
         count={pageCount}

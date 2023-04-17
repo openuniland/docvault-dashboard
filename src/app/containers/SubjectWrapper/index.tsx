@@ -13,7 +13,7 @@ import { useCallback, useMemo, useState } from "react";
 import { SubjectTable } from "app/components/SubjectTable";
 import styles from "./SubjectWrapper.module.scss";
 import { useGetAllSubjects } from "queries/subject";
-import { useAddTheSubject, useApproveTheSubject } from "mutations/subject";
+import { useAddTheSubject, useUpdateTheSubject } from "mutations/subject";
 import { ModalCustomization } from "app/components/ModalCustomization";
 import { DEFAULT_PAGINATION } from "utils/constants";
 import { enqueueSnackbar } from "notistack";
@@ -30,9 +30,10 @@ export const SubjectWrapper = () => {
     data: subjects,
     isLoading,
     refetch: refetchSubjects,
+    isFetching,
   } = useGetAllSubjects({ currentPage: currentPage - 1 });
 
-  const { mutateAsync } = useApproveTheSubject();
+  const { mutateAsync } = useUpdateTheSubject();
   const { mutateAsync: addNewSubject } = useAddTheSubject();
 
   const handleOpenPropup = useCallback(() => {
@@ -49,7 +50,9 @@ export const SubjectWrapper = () => {
         try {
           await mutateAsync({
             id,
-            is_approved,
+            subject: {
+              is_approved: is_approved,
+            },
           });
 
           refetchSubjects();
@@ -147,6 +150,9 @@ export const SubjectWrapper = () => {
         rows={subjects?.data}
         isLoading={isLoading}
         onApprove={handleApproveTheSubject}
+        onRefetchSubjects={refetchSubjects}
+        currentPage={currentPage}
+        isFetching={isFetching}
       />
 
       <Pagination

@@ -5,9 +5,13 @@ export interface Subject {
   updated_at?: Date;
 }
 
-export interface ApproveTheSubjectPayload {
+export interface UpdateSubjectDto {
+  subject_name?: string;
+  is_approved?: boolean;
+}
+export interface UpdateTheSubjectPayload {
   id: string;
-  is_approved: boolean;
+  subject?: UpdateSubjectDto;
 }
 
 export interface NewSubjectPayload {

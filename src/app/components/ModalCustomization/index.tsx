@@ -14,7 +14,7 @@ import styles from "./ModalCustomization.module.scss";
 const cx = classNames.bind(styles);
 
 interface Props {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   open: boolean;
   handleAgree?: () => void;
   handleCancel?: () => void;
@@ -24,6 +24,7 @@ interface Props {
   contentText?: string;
   loading?: boolean;
   className?: string;
+  okBtnText?: string;
 }
 
 export const ModalCustomization = (props: Props) => {
@@ -38,6 +39,7 @@ export const ModalCustomization = (props: Props) => {
     contentText,
     loading,
     className,
+    okBtnText,
   } = props;
   return (
     <Dialog
@@ -52,11 +54,13 @@ export const ModalCustomization = (props: Props) => {
     >
       {title && <DialogTitle id="alert-dialog-title">{title}</DialogTitle>}
 
-      <DialogContent>
-        {contentText && <DialogContentText>{contentText}</DialogContentText>}
+      {children && (
+        <DialogContent>
+          {contentText && <DialogContentText>{contentText}</DialogContentText>}
 
-        {children}
-      </DialogContent>
+          {children}
+        </DialogContent>
+      )}
 
       {actionDefault && (
         <DialogActions>
@@ -69,7 +73,7 @@ export const ModalCustomization = (props: Props) => {
             loading={loading}
             variant="contained"
           >
-            Agree
+            {okBtnText || "Agree"}
           </LoadingButton>
         </DialogActions>
       )}

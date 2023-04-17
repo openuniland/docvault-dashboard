@@ -8,10 +8,9 @@ const withAppHeader = (WrappedComponent: React.ComponentType) => {
         <AppHeader />
         <div
           style={{
-            maxHeight: "calc(100vh - 100px)",
             overflowY: "auto",
-            maxWidth: "calc(100vw - 300px)",
             overflowX: "auto",
+            marginTop: "100px",
           }}
         >
           <WrappedComponent {...props} />

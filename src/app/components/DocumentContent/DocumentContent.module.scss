@@ -1,0 +1,51 @@
+.descWrapper {
+  display: flex;
+  color: #000;
+}
+
+.highlight {
+  color: #00ab55;
+  font-weight: 600;
+  margin-left: 5px;
+}
+
+.titleName,
+.highlight,
+.schoolYear {
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+.content {
+  background-color: #f2f6fc;
+  padding: 20px;
+  margin: 10px 0;
+}
+
+.title {
+  font-size: 24px;
+  color: #000;
+}
+
+.desc,
+.file {
+  color: #000;
+  font-size: 18px;
+}
+
+.imageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  height: 550px;
+  width: 100%;
+}
+
+.image {
+  display: block;
+  height: 100%;
+  max-width: 100%;
+  width: -webkit-fill-available;
+  object-fit: contain;
+}

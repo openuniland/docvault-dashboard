@@ -9,6 +9,7 @@ const withSidebar = (WrappedComponent: React.ComponentType) => {
         <div
           style={{
             flex: 1,
+            marginLeft: "300px",
           }}
         >
           <WrappedComponent {...props} />

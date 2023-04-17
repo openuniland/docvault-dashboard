@@ -6,3 +6,9 @@ export const DEFAULT_PAGINATION = {
   currentPage: 0,
   pageSize: 5,
 };
+
+export const ROLES = {
+  ADMIN: "ADMIN",
+  USER: "USER",
+  APPROVER: "APPROVER",
+};

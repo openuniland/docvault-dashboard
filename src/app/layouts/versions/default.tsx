@@ -10,6 +10,7 @@ import { DocumentPage } from "app/pages/DocumentPage";
 import { NewDocumentPage } from "app/pages/NewDocumentPage";
 import { ExamPage } from "app/pages/ExamPage";
 import { NewExamPage } from "app/pages/NewExamPage";
+import { DocumentDetailPage } from "app/pages/DocumentDetailPage";
 
 const Pages = {
   Guards: Guards,
@@ -19,6 +20,7 @@ const Pages = {
   SubjectPage: withSidebar(withAppHeader(SubjectPage)),
   DocumentPage: withSidebar(withAppHeader(DocumentPage)),
   NewDocumentPage: withSidebar(withAppHeader(NewDocumentPage)),
+  DocumentDetailPage: withSidebar(withAppHeader(DocumentDetailPage)),
   ExamPage: withSidebar(withAppHeader(ExamPage)),
   NewExamPage: withSidebar(withAppHeader(NewExamPage)),
 };
@@ -33,6 +35,10 @@ const Layout = () => {
       <Route path="/subjects" element={<Pages.SubjectPage />} />
       <Route path="/documents" element={<Pages.DocumentPage />} />
       <Route path="/documents/new" element={<Pages.NewDocumentPage />} />
+      <Route
+        path="/documents/:documentId"
+        element={<Pages.DocumentDetailPage />}
+      />
       <Route path="/exams" element={<Pages.ExamPage />} />
       <Route path="/exams/new" element={<Pages.NewExamPage />} />
     </Routes>

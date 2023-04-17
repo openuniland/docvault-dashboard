@@ -38,6 +38,7 @@ import {
 
 import { DocumentModel } from "types/DocumentModel";
 import styles from "./DocumentTable.module.scss";
+import { Link } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
@@ -427,7 +428,14 @@ export const DocumentTable = (props: Props) => {
                           ? row.author?.fullname
                           : row?.author?.nickname}
                       </TableCell>
-                      <TableCell align="left">{row.title}</TableCell>
+                      <TableCell align="left">
+                        <Link
+                          className={cx("link")}
+                          to={`/documents/${row._id}`}
+                        >
+                          {row.title}
+                        </Link>
+                      </TableCell>
                       <TableCell align="left">
                         <Switch
                           checked={row.is_approved}

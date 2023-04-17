@@ -204,6 +204,8 @@ interface Props {
   isLoading?: boolean;
   onApprove?: (id: string, is_approved: boolean) => void;
   onRefetchSubjects?: () => void;
+  currentPage?: number;
+  isFetching?: boolean;
 }
 
 export const SubjectTable = (props: Props) => {
@@ -212,6 +214,8 @@ export const SubjectTable = (props: Props) => {
     isLoading = false,
     onApprove = () => {},
     onRefetchSubjects = () => {},
+    currentPage,
+    isFetching,
   } = props;
 
   const [subjects, setSubjects] = useState<Subject[]>(rows);
@@ -362,7 +366,7 @@ export const SubjectTable = (props: Props) => {
   useEffect(() => {
     const data = handleSort(order, orderBy, rows);
     setSubjects(data);
-  }, [rows]);
+  }, [rows?.length, currentPage, isFetching]);
 
   const handleClosePropup = useCallback(() => {
     setOpenPropup(false);

@@ -30,6 +30,7 @@ export const SubjectWrapper = () => {
     data: subjects,
     isLoading,
     refetch: refetchSubjects,
+    isFetching,
   } = useGetAllSubjects({ currentPage: currentPage - 1 });
 
   const { mutateAsync } = useUpdateTheSubject();
@@ -150,6 +151,8 @@ export const SubjectWrapper = () => {
         isLoading={isLoading}
         onApprove={handleApproveTheSubject}
         onRefetchSubjects={refetchSubjects}
+        currentPage={currentPage}
+        isFetching={isFetching}
       />
 
       <Pagination

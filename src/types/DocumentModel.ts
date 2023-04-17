@@ -45,3 +45,7 @@ export interface CreateTheDocumentPayload {
   content?: DocumentModelContent[];
   is_approved: boolean;
 }
+
+export interface GetTheDocumentParams {
+  id: string;
+}

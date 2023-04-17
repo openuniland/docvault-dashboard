@@ -138,3 +138,14 @@
   min-height: 435px;
   max-width: calc(100vw - 340px);
 }
+
+.link {
+  text-decoration: none;
+  color: #000;
+  text-transform: capitalize;
+
+  &:hover {
+    text-decoration: underline;
+    color: #00ab55;
+  }
+}

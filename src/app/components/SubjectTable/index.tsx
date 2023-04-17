@@ -18,7 +18,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import { useNavigate } from "react-router-dom";
 import {
   Autocomplete,
   FormControl,
@@ -38,6 +37,9 @@ import {
 
 import { Subject } from "types/Subject";
 import styles from "./SubjectTable.module.scss";
+import { ModalCustomization } from "../ModalCustomization";
+import { enqueueSnackbar } from "notistack";
+import { useUpdateTheSubject } from "mutations/subject";
 
 const cx = classNames.bind(styles);
 
@@ -201,12 +203,20 @@ interface Props {
   rows?: Subject[];
   isLoading?: boolean;
   onApprove?: (id: string, is_approved: boolean) => void;
+  onRefetchSubjects?: () => void;
+  currentPage?: number;
+  isFetching?: boolean;
 }
 
 export const SubjectTable = (props: Props) => {
-  const { rows = [], isLoading = false, onApprove = () => {} } = props;
-
-  const navigate = useNavigate();
+  const {
+    rows = [],
+    isLoading = false,
+    onApprove = () => {},
+    onRefetchSubjects = () => {},
+    currentPage,
+    isFetching,
+  } = props;
 
   const [subjects, setSubjects] = useState<Subject[]>(rows);
   const [order, setOrder] = useState<Order>("desc");
@@ -214,8 +224,13 @@ export const SubjectTable = (props: Props) => {
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [valueOfTab, setValueOfTab] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [editId, setEditId] = useState("");
+  const [currentRow, setCurrentRow] = useState({} as Subject);
   const open = Boolean(anchorEl);
+  const [openPropup, setOpenPropup] = useState(false);
+  const [subjectName, setSubjectName] = useState("");
+  const [responseError, setResponseError] = useState("");
+
+  const { mutateAsync } = useUpdateTheSubject();
 
   const handleSelectAllClick = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -324,20 +339,22 @@ export const SubjectTable = (props: Props) => {
   );
 
   const handleShowAction = useCallback(
-    (id: string) => (event: React.MouseEvent<HTMLButtonElement>) => {
+    (row: Subject) => (event: React.MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
-      setEditId(id);
+      setCurrentRow(row);
     },
-    [anchorEl, editId],
+    [anchorEl, currentRow],
   );
 
   const handleCloseMenu = useCallback(() => {
     setAnchorEl(null);
   }, [anchorEl]);
 
-  const handleToEditPage = useCallback(() => {
-    navigate(`/users/edit/${editId}`);
-  }, [navigate, editId]);
+  const handleEditSubject = useCallback(() => {
+    setOpenPropup(true);
+    handleCloseMenu();
+    setSubjectName(currentRow.subject_name);
+  }, [currentRow]);
 
   const handleToggleApprove = useCallback(
     (id: string, is_approved: boolean) => () => {
@@ -349,7 +366,43 @@ export const SubjectTable = (props: Props) => {
   useEffect(() => {
     const data = handleSort(order, orderBy, rows);
     setSubjects(data);
-  }, [rows]);
+  }, [rows?.length, currentPage, isFetching]);
+
+  const handleClosePropup = useCallback(() => {
+    setOpenPropup(false);
+  }, [setOpenPropup]);
+
+  const handleUpdateSubject = useCallback(async () => {
+    try {
+      if (!subjectName) return;
+
+      await mutateAsync({
+        id: currentRow._id,
+        subject: {
+          subject_name: subjectName,
+        },
+      });
+
+      onRefetchSubjects();
+      setSubjectName("");
+      handleClosePropup();
+      setResponseError("");
+      enqueueSnackbar("Subject successfully updated!", {
+        variant: "success",
+      });
+    } catch (error: any) {
+      setResponseError(error?.message);
+      console.log(error);
+    }
+  }, [subjectName, responseError, currentRow._id]);
+
+  const handleChangeNewSubject = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSubjectName(event.target.value);
+      setResponseError("");
+    },
+    [subjectName],
+  );
 
   return (
     <Box className={cx("container")}>
@@ -428,7 +481,7 @@ export const SubjectTable = (props: Props) => {
                       <TableCell align="left">
                         <IconButton
                           className={cx("actionItem")}
-                          onClick={handleShowAction(row._id)}
+                          onClick={handleShowAction(row)}
                         >
                           <MoreVertIcon />
                         </IconButton>
@@ -456,7 +509,7 @@ export const SubjectTable = (props: Props) => {
                           <p className={cx("delete")}>Delete</p>
                         </MenuItem>
                         <MenuItem
-                          onClick={handleToEditPage}
+                          onClick={handleEditSubject}
                           className={cx("menuItem")}
                         >
                           <EditIcon className={cx("icon")} />
@@ -471,6 +524,24 @@ export const SubjectTable = (props: Props) => {
           </TableContainer>
         </Paper>
       </Paper>
+
+      <ModalCustomization
+        open={openPropup}
+        handleAgree={handleUpdateSubject}
+        handleCancel={handleClosePropup}
+        actionDefault
+        title="Update subject"
+        okBtnText="Update"
+      >
+        <TextField
+          placeholder="Subject name"
+          className={cx("subjectNameInput")}
+          value={subjectName}
+          onChange={handleChangeNewSubject}
+          error={!!responseError}
+          helperText={responseError}
+        />
+      </ModalCustomization>
     </Box>
   );
 };

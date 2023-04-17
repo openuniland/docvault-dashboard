@@ -1,11 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as Yup from "yup";
 import {
   Box,
   Paper,
   Switch,
   TextField,
-  //   FormGroup,
   FormControl,
   Autocomplete,
   Button,
@@ -17,6 +16,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "./UserForm.module.scss";
 import userIcon from "assets/images/user.png";
 import { User } from "types/User";
+import { ROLES } from "utils/constants";
 
 const cx = classNames.bind(styles);
 
@@ -32,17 +32,18 @@ interface IFormProps {
   email: string;
   fullname: string;
   roles: string;
-  is_deleted: boolean;
+  is_blocked: boolean;
 }
 
 interface Props {
   onAddUser?: (user: any) => void;
   onUpdateUser?: (user: any) => void;
   userInfo?: User;
+  isUpdateMode?: boolean;
 }
 
 export const UserForm = (props: Props) => {
-  const { onAddUser = () => {} } = props;
+  const { onAddUser = () => {}, isUpdateMode, userInfo } = props;
   const [activated, setActivated] = useState(true);
 
   const {
@@ -50,6 +51,7 @@ export const UserForm = (props: Props) => {
     control,
     formState: { errors },
     reset: resetUserForm,
+    setValue,
   } = useForm<IFormProps>({
     resolver: yupResolver(AddUserSchema),
     defaultValues: {
@@ -69,20 +71,34 @@ export const UserForm = (props: Props) => {
       onAddUser({
         email: data.email,
         roles: data.roles,
-        is_deleted: !activated,
+        is_blocked: !activated,
       });
+
+      if (isUpdateMode) return;
 
       resetUserForm();
     },
     [activated],
   );
 
+  useEffect(() => {
+    if (isUpdateMode && userInfo) {
+      setValue("email", userInfo?.email);
+      setValue("roles", userInfo?.roles);
+      setActivated(!userInfo?.is_blocked);
+    }
+  }, [userInfo?._id, userInfo?.email, userInfo?.roles]);
+
   return (
     <div className={cx("container")}>
       <Paper elevation={3} className={cx("paper")}>
         <Box className={cx("card")}>
           <div className={cx("imgWrapper")}>
-            <img src={userIcon} alt="avatar" className={cx("img")} />
+            <img
+              src={userInfo?.avatar || userIcon}
+              alt="avatar"
+              className={cx("img")}
+            />
           </div>
           <p className={cx("cardDesc")}>
             Ảnh sẽ tự động cập nhật theo tài khoản google của người dùng!
@@ -100,7 +116,7 @@ export const UserForm = (props: Props) => {
               <Controller
                 name="email"
                 control={control}
-                defaultValue=""
+                defaultValue={(isUpdateMode && userInfo?.email) || ""}
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -125,7 +141,7 @@ export const UserForm = (props: Props) => {
                       onChange(item);
                     }}
                     value={value || null}
-                    options={["ADMIN", "USER"]}
+                    options={[ROLES.ADMIN, ROLES.APPROVER, ROLES.USER]}
                     sx={{ width: 300 }}
                     disablePortal
                     renderInput={params => (
@@ -138,13 +154,23 @@ export const UserForm = (props: Props) => {
           </Box>
 
           <FormControl className={cx("formItem")}>
-            <Button
-              className={cx("btnSubmit")}
-              variant="contained"
-              type="submit"
-            >
-              Submit
-            </Button>
+            {isUpdateMode ? (
+              <Button
+                className={cx("btnSubmit")}
+                variant="contained"
+                type="submit"
+              >
+                Update
+              </Button>
+            ) : (
+              <Button
+                className={cx("btnSubmit")}
+                variant="contained"
+                type="submit"
+              >
+                Submit
+              </Button>
+            )}
           </FormControl>
         </form>
       </Paper>

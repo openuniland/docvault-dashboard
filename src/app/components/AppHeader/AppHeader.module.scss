@@ -1,9 +1,13 @@
 .container {
   height: 100px;
+  width: calc(100% - 300px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
+  position: fixed;
+  background-color: #fff;
+  z-index: 1;
 }
 
 .action {

@@ -23,6 +23,7 @@ export const UserWrapper = () => {
   const {
     data: users,
     isLoading,
+    isRefetching,
     refetch: refetchUsers,
   } = useGetAllUsers({ currentPage: currentPage - 1 });
 
@@ -47,6 +48,7 @@ export const UserWrapper = () => {
 
     return Math.ceil(total / pageSize);
   }, [users?.meta?.total]);
+
   return (
     <div className={cx("container")}>
       <Box className={cx("boxHeader")}>
@@ -79,7 +81,12 @@ export const UserWrapper = () => {
           </Button>
         </Box>
       </Box>
-      <UsersTable rows={users?.data} isLoading={isLoading} />
+      <UsersTable
+        rows={users?.data}
+        isLoading={isLoading}
+        isRefetching={isRefetching}
+        currentPage={currentPage}
+      />
 
       <Pagination
         count={pageCount}

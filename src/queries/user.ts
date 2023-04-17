@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
-import { getAllUsers } from "services/user";
+import { getAUserInfo, getAllUsers } from "services/user";
 import { URLparams } from "types";
+import { GetUserInfoPayload } from "types/User";
 
 import { STALE_TIME } from "utils/constants";
 
@@ -12,3 +13,8 @@ export const useGetAllUsers = (urlParams: URLparams) =>
       staleTime: STALE_TIME.ONE_HOUR,
     },
   );
+
+export const useGetAUserInfo = (payload: GetUserInfoPayload) =>
+  useQuery(["get-a-userinfo", payload.id], () => getAUserInfo(payload), {
+    staleTime: STALE_TIME.ONE_HOUR,
+  });

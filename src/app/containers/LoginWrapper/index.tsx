@@ -68,8 +68,8 @@ export const LoginWrapper = () => {
         </ButtonCustomization>
         <div className={cx("desc")}>
           <p>Go to</p>
-          <a href="https://github.com/openuniland" target="_blank">
-            Revise
+          <a href="https://docvault.vercel.app" target="_blank">
+            Docvault
           </a>
         </div>
       </div>

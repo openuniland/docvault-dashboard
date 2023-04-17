@@ -1,9 +1,9 @@
 import { AxiosResponse } from "axios";
 import { DataWithMeta, URLparams } from "types";
 import {
-  ApproveTheSubjectPayload,
   NewSubjectPayload,
   Subject,
+  UpdateTheSubjectPayload,
 } from "types/Subject";
 
 import http from "utils/api/http";
@@ -28,12 +28,13 @@ export const getAllSubjectsApproved = async (): Promise<Subject[]> => {
   return response?.data?.data;
 };
 
-export const approveTheSubject = async (
-  payload: ApproveTheSubjectPayload,
+export const updateTheSubject = async (
+  payload: UpdateTheSubjectPayload,
 ): Promise<Subject[]> => {
-  const response: AxiosResponse = await http.put(`/subjects/${payload.id}`, {
-    is_approved: payload.is_approved,
-  });
+  const response: AxiosResponse = await http.put(
+    `/subjects/${payload.id}`,
+    payload.subject,
+  );
 
   return response?.data?.data;
 };

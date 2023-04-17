@@ -5,6 +5,7 @@ import {
   ApproveTheDocumentPayload,
   CreateTheDocumentPayload,
   DocumentModel,
+  GetTheDocumentParams,
 } from "types/DocumentModel";
 import {} from "types/Subject";
 
@@ -44,6 +45,14 @@ export const createTheDocument = async (
     `/administrator/documents`,
     payload,
   );
+
+  return response?.data?.data;
+};
+
+export const getDocumentDetail = async (
+  params: GetTheDocumentParams,
+): Promise<DocumentModel> => {
+  const response: AxiosResponse = await http.get(`/documents/${params.id}`);
 
   return response?.data?.data;
 };

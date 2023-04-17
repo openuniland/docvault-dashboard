@@ -40,6 +40,10 @@ http.interceptors.response.use(
       return apiResponseData;
     }
 
+    if (errorCode === "NOT_AUTHORIZED") {
+      window.location.replace("/");
+    }
+
     if (
       errorCode === "INVALID_TOKEN" ||
       errorCode === "UNAUTHORIZED" ||

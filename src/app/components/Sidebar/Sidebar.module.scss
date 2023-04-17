@@ -1,7 +1,9 @@
 .container {
   max-width: 300px;
+  height: 100vh;
   border-right: 1px dashed rgb(229, 231, 235);
-  position: relative;
+  position: fixed;
+  z-index: 5;
 }
 
 .arrow {
@@ -13,6 +15,7 @@
   right: 0;
   transform: translate(50%, -50%);
   border: 1px dashed rgb(229, 231, 235);
+  z-index: 5;
 
   & .icon {
     fill: rgb(155, 155, 155);

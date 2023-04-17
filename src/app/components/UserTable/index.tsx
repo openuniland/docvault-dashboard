@@ -246,6 +246,8 @@ export const UsersTable = (props: Props) => {
 
   const handleSort = useCallback(
     (newOrder: Order, newOrderBy: keyof User, newDocuments: User[]) => {
+      console.log("newDocuments", newDocuments);
+
       let newArray = [...newDocuments];
 
       newArray.sort((itemA, itemB) => {

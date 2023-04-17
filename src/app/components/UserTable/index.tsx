@@ -90,6 +90,12 @@ const headCells: readonly HeadCell[] = [
     disablePadding: false,
     label: "",
   },
+  {
+    id: "_id",
+    numeric: false,
+    disablePadding: false,
+    label: "",
+  },
 ];
 
 interface TableHeadProps {

@@ -45,5 +45,5 @@ export const updateUser = async (payload: UpdateUserPayload): Promise<User> => {
     payload.userInfo,
   );
 
-  return response?.data?.data;
+  return response?.data;
 };

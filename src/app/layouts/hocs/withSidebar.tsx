@@ -4,7 +4,7 @@ import { Sidebar } from "app/components/Sidebar";
 const withSidebar = (WrappedComponent: React.ComponentType) => {
   return (props: JSX.IntrinsicAttributes) => {
     return (
-      <div style={{ display: "flex", minHeight: "100vh" }}>
+      <div style={{ display: "flex" }}>
         <Sidebar />
         <div
           style={{

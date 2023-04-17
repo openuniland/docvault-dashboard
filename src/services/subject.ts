@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
 import { DataWithMeta, URLparams } from "types";
+import { ApproveTheDocumentPayload } from "types/DocumentModel";
 import {
   NewSubjectPayload,
   Subject,
@@ -43,6 +44,16 @@ export const addTheSubject = async (
   payload: NewSubjectPayload,
 ): Promise<Subject[]> => {
   const response: AxiosResponse = await http.post(`/subjects`, payload);
+
+  return response?.data?.data;
+};
+
+export const approveTheSubject = async (
+  payload: ApproveTheDocumentPayload,
+): Promise<Subject[]> => {
+  const response: AxiosResponse = await http.put(`/subjects/${payload.id}`, {
+    is_approved: payload.is_approved,
+  });
 
   return response?.data?.data;
 };

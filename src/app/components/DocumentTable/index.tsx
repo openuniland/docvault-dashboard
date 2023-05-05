@@ -38,6 +38,7 @@ import {
 
 import { DocumentModel } from "types/DocumentModel";
 import styles from "./DocumentTable.module.scss";
+import { ModalCustomization } from "app/components/ModalCustomization";
 
 const cx = classNames.bind(styles);
 
@@ -209,10 +210,18 @@ interface Props {
   rows?: DocumentModel[];
   isLoading?: boolean;
   onApprove?: (id: string, is_approved: boolean) => void;
+  onDelete?: (id: string) => void;
+  isLoadingDeleteDocument?: boolean;
 }
 
 export const DocumentTable = (props: Props) => {
-  const { rows = [], isLoading = false, onApprove = () => {} } = props;
+  const {
+    rows = [],
+    isLoading = false,
+    onApprove = () => {},
+    onDelete = () => {},
+    isLoadingDeleteDocument = false,
+  } = props;
 
   const navigate = useNavigate();
 
@@ -223,6 +232,7 @@ export const DocumentTable = (props: Props) => {
   const [valueOfTab, setValueOfTab] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editId, setEditId] = useState("");
+  const [openPropup, setOpenPropup] = useState(false);
   const open = Boolean(anchorEl);
 
   const handleSelectAllClick = useCallback(
@@ -363,6 +373,20 @@ export const DocumentTable = (props: Props) => {
     [valueOfTab, rows],
   );
 
+  const handleClosePropup = useCallback(() => {
+    setOpenPropup(false);
+  }, [openPropup]);
+
+  const handleOpenPropup = useCallback(() => {
+    setOpenPropup(true);
+    handleCloseMenu();
+  }, [openPropup]);
+
+  const handleDeleteOneRow = useCallback(() => {
+    handleClosePropup();
+    onDelete(editId);
+  }, [editId]);
+
   return (
     <Box className={cx("container")}>
       {isLoading && <LinearProgress />}
@@ -473,11 +497,11 @@ export const DocumentTable = (props: Props) => {
                         classes={{ paper: cx("paperOfMenu") }}
                       >
                         <MenuItem
-                          onClick={handleCloseMenu}
+                          onClick={handleOpenPropup}
                           className={cx("menuItem")}
                         >
                           <DeleteOutlineIcon className={cx("delete", "icon")} />
-                          <p className={cx("delete")}>Delete</p>
+                          <span className={cx("delete")}>Delete</span>
                         </MenuItem>
                         <MenuItem
                           onClick={handleToEditPage}
@@ -495,6 +519,16 @@ export const DocumentTable = (props: Props) => {
           </TableContainer>
         </Paper>
       </Paper>
+
+      <ModalCustomization
+        open={openPropup}
+        handleAgree={handleDeleteOneRow}
+        handleCancel={handleClosePropup}
+        actionDefault
+        title="Bạn có chắc chắn muốn xóa?"
+        okBtnText="Delete"
+        loading={isLoadingDeleteDocument}
+      />
     </Box>
   );
 };

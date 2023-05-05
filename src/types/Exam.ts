@@ -50,3 +50,7 @@ export interface RequestUpdateExamPayload {
   examId: string;
   requestUpdateExamPayload: CreateExamModelForm;
 }
+
+export interface DeleteExamParams {
+  id: string;
+}

@@ -1,7 +1,12 @@
 import { AxiosResponse } from "axios";
 
 import { DataWithMeta, URLparams } from "types";
-import { ApproveTheExamPayload, Exam, RequestUpdateExam } from "types/Exam";
+import {
+  ApproveTheExamPayload,
+  DeleteExamParams,
+  Exam,
+  RequestUpdateExam,
+} from "types/Exam";
 import http from "utils/api/http";
 import { DEFAULT_PAGINATION } from "utils/constants";
 
@@ -51,6 +56,12 @@ export const updateExamByAdmin = async (
 
 export const getDraftExam = async (): Promise<Exam> => {
   const response: AxiosResponse = await http.get(`/exams/draft-exam`);
+
+  return response?.data?.data;
+};
+
+export const deleteExam = async (params: DeleteExamParams): Promise<Exam> => {
+  const response: AxiosResponse = await http.delete(`/exams/${params.id}`);
 
   return response?.data?.data;
 };

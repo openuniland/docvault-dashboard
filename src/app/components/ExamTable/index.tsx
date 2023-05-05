@@ -38,6 +38,7 @@ import {
 
 import styles from "./ExamTable.module.scss";
 import { Exam } from "types/Exam";
+import { ModalCustomization } from "../ModalCustomization";
 
 const cx = classNames.bind(styles);
 
@@ -209,10 +210,18 @@ interface Props {
   rows?: Exam[];
   isLoading?: boolean;
   onApprove?: (id: string, is_approved: boolean) => void;
+  onDelete?: (id: string) => void;
+  isLoadingDeleteExam?: boolean;
 }
 
 export const ExamTable = (props: Props) => {
-  const { rows = [], isLoading = false, onApprove = () => {} } = props;
+  const {
+    rows = [],
+    isLoading = false,
+    onApprove = () => {},
+    onDelete = () => {},
+    isLoadingDeleteExam = false,
+  } = props;
 
   const navigate = useNavigate();
 
@@ -223,6 +232,7 @@ export const ExamTable = (props: Props) => {
   const [valueOfTab, setValueOfTab] = useState(0);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editId, setEditId] = useState("");
+  const [openPropup, setOpenPropup] = useState(false);
   const open = Boolean(anchorEl);
 
   const handleSelectAllClick = useCallback(
@@ -359,6 +369,20 @@ export const ExamTable = (props: Props) => {
     [valueOfTab, rows],
   );
 
+  const handleClosePropup = useCallback(() => {
+    setOpenPropup(false);
+  }, [openPropup]);
+
+  const handleOpenPropup = useCallback(() => {
+    setOpenPropup(true);
+    handleCloseMenu();
+  }, [openPropup]);
+
+  const handleDeleteOneRow = useCallback(() => {
+    handleClosePropup();
+    onDelete(editId);
+  }, [editId]);
+
   return (
     <Box className={cx("container")}>
       {isLoading && <LinearProgress />}
@@ -462,7 +486,7 @@ export const ExamTable = (props: Props) => {
                         classes={{ paper: cx("paperOfMenu") }}
                       >
                         <MenuItem
-                          onClick={handleCloseMenu}
+                          onClick={handleOpenPropup}
                           className={cx("menuItem")}
                         >
                           <DeleteOutlineIcon className={cx("delete", "icon")} />
@@ -473,7 +497,7 @@ export const ExamTable = (props: Props) => {
                           className={cx("menuItem")}
                         >
                           <EditIcon className={cx("icon")} />
-                          <p>Edit</p>
+                          <span>Edit</span>
                         </MenuItem>
                       </Menu>
                     </TableRow>
@@ -484,6 +508,16 @@ export const ExamTable = (props: Props) => {
           </TableContainer>
         </Paper>
       </Paper>
+
+      <ModalCustomization
+        open={openPropup}
+        handleAgree={handleDeleteOneRow}
+        handleCancel={handleClosePropup}
+        actionDefault
+        title="Bạn có chắc chắn muốn xóa?"
+        okBtnText="Delete"
+        loading={isLoadingDeleteExam}
+      />
     </Box>
   );
 };

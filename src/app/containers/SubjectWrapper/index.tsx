@@ -179,22 +179,6 @@ export const SubjectWrapper = () => {
         onChange={handlePagination}
       />
 
-      <Pagination
-        count={pageCount}
-        variant="outlined"
-        shape="rounded"
-        page={currentPage}
-        onChange={handlePagination}
-      />
-
-      <Pagination
-        count={pageCount}
-        variant="outlined"
-        shape="rounded"
-        page={currentPage}
-        onChange={handlePagination}
-      />
-
       <ModalCustomization
         open={openPropup}
         handleAgree={handleAddNewSubject}

@@ -12,7 +12,7 @@ import { useCallback, useMemo, useState } from "react";
 import styles from "./DocumentWrapper.module.scss";
 import { DocumentTable } from "app/components/DocumentTable";
 import { useGetAllDocument } from "queries/document";
-import { useApproveTheDocument } from "mutations/document";
+import { useApproveTheDocument, useDeleteDocument } from "mutations/document";
 import { DEFAULT_PAGINATION } from "utils/constants";
 import { enqueueSnackbar } from "notistack";
 
@@ -30,6 +30,8 @@ export const DocumentWrapper = () => {
   } = useGetAllDocument({ currentPage: currentPage - 1 });
 
   const { mutateAsync } = useApproveTheDocument();
+  const { mutateAsync: deleteDocument, isLoading: isLoadingDeleteDocument } =
+    useDeleteDocument();
 
   const handleApproveTheSubject = useCallback(
     (id: string, is_approved: boolean) => {
@@ -52,6 +54,23 @@ export const DocumentWrapper = () => {
     },
     [],
   );
+
+  const handleDeleteDocument = useCallback(async (id: string) => {
+    try {
+      await deleteDocument({ id });
+
+      enqueueSnackbar("Delete document successful!", {
+        variant: "success",
+      });
+
+      refetchDocuments();
+    } catch (error: any) {
+      console.log(error);
+      enqueueSnackbar("Delete document failure!", {
+        variant: "error",
+      });
+    }
+  }, []);
 
   const handleRefreshDocument = useCallback(() => {
     refetchDocuments();
@@ -110,6 +129,8 @@ export const DocumentWrapper = () => {
         rows={documents?.data}
         isLoading={isLoading}
         onApprove={handleApproveTheSubject}
+        onDelete={handleDeleteDocument}
+        isLoadingDeleteDocument={isLoadingDeleteDocument}
       />
 
       <Pagination

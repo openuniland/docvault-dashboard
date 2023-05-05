@@ -206,6 +206,8 @@ interface Props {
   onRefetchSubjects?: () => void;
   currentPage?: number;
   isFetching?: boolean;
+  onDelete?: (id: string) => void;
+  isLoadingDeleteSubject?: boolean;
 }
 
 export const SubjectTable = (props: Props) => {
@@ -216,6 +218,8 @@ export const SubjectTable = (props: Props) => {
     onRefetchSubjects = () => {},
     currentPage,
     isFetching,
+    onDelete = () => {},
+    isLoadingDeleteSubject = false,
   } = props;
 
   const [subjects, setSubjects] = useState<Subject[]>(rows);
@@ -229,6 +233,7 @@ export const SubjectTable = (props: Props) => {
   const [openPropup, setOpenPropup] = useState(false);
   const [subjectName, setSubjectName] = useState("");
   const [responseError, setResponseError] = useState("");
+  const [isCfDelete, setIsCfDelete] = useState(false);
 
   const { mutateAsync } = useUpdateTheSubject();
 
@@ -404,6 +409,20 @@ export const SubjectTable = (props: Props) => {
     [subjectName],
   );
 
+  const handleCloseCfDelete = useCallback(() => {
+    setIsCfDelete(false);
+  }, [isCfDelete]);
+
+  const handleOpenCfDelete = useCallback(() => {
+    setIsCfDelete(true);
+    handleCloseMenu();
+  }, [isCfDelete]);
+
+  const handleDeleteOneRow = useCallback(() => {
+    handleCloseCfDelete();
+    onDelete(currentRow?._id);
+  }, [currentRow?._id]);
+
   return (
     <Box className={cx("container")}>
       {isLoading && <LinearProgress />}
@@ -502,7 +521,7 @@ export const SubjectTable = (props: Props) => {
                         classes={{ paper: cx("paperOfMenu") }}
                       >
                         <MenuItem
-                          onClick={handleCloseMenu}
+                          onClick={handleOpenCfDelete}
                           className={cx("menuItem")}
                         >
                           <DeleteOutlineIcon className={cx("delete", "icon")} />
@@ -542,6 +561,16 @@ export const SubjectTable = (props: Props) => {
           helperText={responseError}
         />
       </ModalCustomization>
+
+      <ModalCustomization
+        open={isCfDelete}
+        handleAgree={handleDeleteOneRow}
+        handleCancel={handleCloseCfDelete}
+        actionDefault
+        title="Bạn có chắc chắn muốn xóa?"
+        okBtnText="Delete"
+        loading={isLoadingDeleteSubject}
+      />
     </Box>
   );
 };

@@ -14,7 +14,7 @@ import styles from "./ExamWrapper.module.scss";
 import { DEFAULT_PAGINATION } from "utils/constants";
 import { ExamTable } from "app/components/ExamTable";
 import { useGetAllExams } from "queries/exam";
-import { useApproveTheExam } from "mutations/exam";
+import { useApproveTheExam, useDeleteExam } from "mutations/exam";
 
 const cx = classNames.bind(styles);
 
@@ -30,28 +30,47 @@ export const ExamWrapper = () => {
   } = useGetAllExams({ currentPage: currentPage - 1 });
 
   const { mutateAsync, isError } = useApproveTheExam();
+  const { mutateAsync: deleteExam, isLoading: isLoadingDeleteExam } =
+    useDeleteExam();
 
   const handleApproveTheExam = useCallback(
-    (id: string, is_approved: boolean) => {
-      (async () => {
-        try {
-          await mutateAsync({
-            id,
-            is_approved,
-          });
+    async (id: string, is_approved: boolean) => {
+      try {
+        await mutateAsync({
+          id,
+          is_approved,
+        });
 
-          enqueueSnackbar("Approval processing successful!", {
-            variant: "success",
-          });
+        enqueueSnackbar("Approval processing successful!", {
+          variant: "success",
+        });
 
-          refetchExams();
-        } catch (error: any) {
-          console.log(error);
-        }
-      })();
+        refetchExams();
+      } catch (error: any) {
+        console.log(error);
+      }
     },
     [],
   );
+
+  const handleADeleteExam = useCallback(async (id: string) => {
+    try {
+      await deleteExam({
+        id,
+      });
+
+      enqueueSnackbar("Delete exam successful!", {
+        variant: "success",
+      });
+
+      refetchExams();
+    } catch (error: any) {
+      console.log(error);
+      enqueueSnackbar("Delete exam failure!", {
+        variant: "error",
+      });
+    }
+  }, []);
 
   const handleRefreshDocument = useCallback(() => {
     refetchExams();
@@ -118,6 +137,8 @@ export const ExamWrapper = () => {
         rows={exams?.data}
         isLoading={isLoading}
         onApprove={handleApproveTheExam}
+        onDelete={handleADeleteExam}
+        isLoadingDeleteExam={isLoadingDeleteExam}
       />
 
       <Pagination

@@ -13,7 +13,11 @@ import { useCallback, useMemo, useState } from "react";
 import { SubjectTable } from "app/components/SubjectTable";
 import styles from "./SubjectWrapper.module.scss";
 import { useGetAllSubjects } from "queries/subject";
-import { useAddTheSubject, useUpdateTheSubject } from "mutations/subject";
+import {
+  useAddTheSubject,
+  useDeleteSubject,
+  useUpdateTheSubject,
+} from "mutations/subject";
 import { ModalCustomization } from "app/components/ModalCustomization";
 import { DEFAULT_PAGINATION } from "utils/constants";
 import { enqueueSnackbar } from "notistack";
@@ -35,6 +39,8 @@ export const SubjectWrapper = () => {
 
   const { mutateAsync } = useUpdateTheSubject();
   const { mutateAsync: addNewSubject } = useAddTheSubject();
+  const { mutateAsync: deleteSubject, isLoading: isLoadingDeleteSubject } =
+    useDeleteSubject();
 
   const handleOpenPropup = useCallback(() => {
     setOpenPropup(true);
@@ -45,46 +51,54 @@ export const SubjectWrapper = () => {
   }, [setOpenPropup]);
 
   const handleApproveTheSubject = useCallback(
-    (id: string, is_approved: boolean) => {
-      (async () => {
-        try {
-          await mutateAsync({
-            id,
-            subject: {
-              is_approved: is_approved,
-            },
-          });
+    async (id: string, is_approved: boolean) => {
+      try {
+        await mutateAsync({
+          id,
+          subject: {
+            is_approved: is_approved,
+          },
+        });
 
-          refetchSubjects();
-        } catch (error: any) {
-          console.log(error);
-        }
-      })();
+        refetchSubjects();
+      } catch (error: any) {
+        console.log(error);
+      }
     },
     [],
   );
 
-  const handleAddNewSubject = useCallback(() => {
-    (async () => {
-      try {
-        if (!subjectName) return;
+  const handleDeleteSubject = useCallback(async (id: string) => {
+    try {
+      await deleteSubject({
+        id,
+      });
 
-        await addNewSubject({
-          subject_name: subjectName,
-        });
+      refetchSubjects();
+    } catch (error: any) {
+      console.log(error);
+    }
+  }, []);
 
-        setSubjectName("");
-        handleClosePropup();
-        refetchSubjects();
-        setResponseError("");
-        enqueueSnackbar("New subject successfully created!", {
-          variant: "success",
-        });
-      } catch (error: any) {
-        setResponseError(error?.message);
-        console.log(error);
-      }
-    })();
+  const handleAddNewSubject = useCallback(async () => {
+    try {
+      if (!subjectName) return;
+
+      await addNewSubject({
+        subject_name: subjectName,
+      });
+
+      setSubjectName("");
+      handleClosePropup();
+      refetchSubjects();
+      setResponseError("");
+      enqueueSnackbar("New subject successfully created!", {
+        variant: "success",
+      });
+    } catch (error: any) {
+      setResponseError(error?.message);
+      console.log(error);
+    }
   }, [subjectName, responseError]);
 
   const handleChangeNewSubject = useCallback(
@@ -153,6 +167,16 @@ export const SubjectWrapper = () => {
         onRefetchSubjects={refetchSubjects}
         currentPage={currentPage}
         isFetching={isFetching}
+        onDelete={handleDeleteSubject}
+        isLoadingDeleteSubject={isLoadingDeleteSubject}
+      />
+
+      <Pagination
+        count={pageCount}
+        variant="outlined"
+        shape="rounded"
+        page={currentPage}
+        onChange={handlePagination}
       />
 
       <Pagination

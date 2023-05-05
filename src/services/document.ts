@@ -56,3 +56,11 @@ export const getDocumentDetail = async (
 
   return response?.data?.data;
 };
+
+export const deleteDocument = async (
+  params: GetTheDocumentParams,
+): Promise<DocumentModel> => {
+  const response: AxiosResponse = await http.delete(`/documents/${params.id}`);
+
+  return response?.data?.data;
+};

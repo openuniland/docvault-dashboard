@@ -17,3 +17,7 @@ export interface UpdateTheSubjectPayload {
 export interface NewSubjectPayload {
   subject_name: string;
 }
+
+export interface DeleteSubjectParams {
+  id: string;
+}

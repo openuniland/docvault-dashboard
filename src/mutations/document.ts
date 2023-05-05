@@ -1,9 +1,14 @@
 import { useMutation } from "react-query";
 
-import { approveTheDocument, createTheDocument } from "services/document";
+import {
+  approveTheDocument,
+  createTheDocument,
+  deleteDocument,
+} from "services/document";
 import {
   ApproveTheDocumentPayload,
   CreateTheDocumentPayload,
+  GetTheDocumentParams,
 } from "types/DocumentModel";
 
 export const useApproveTheDocument = () =>
@@ -15,3 +20,6 @@ export const useCreateTheDocument = () =>
   useMutation((payload: CreateTheDocumentPayload) =>
     createTheDocument(payload),
   );
+
+export const useDeleteDocument = () =>
+  useMutation((payload: GetTheDocumentParams) => deleteDocument(payload));
